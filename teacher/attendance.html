@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTHS LMS - Class Attendance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/attendance.css">
+    
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <button class="burger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="teacher-container">
+        <!-- Sidebar Navigation -->
+        <aside class="teacher-sidebar">
+            <div class="sidebar-header">
+                <img src="../images/FTHS-logo.jpg" alt="FTHS Logo" class="logo">
+                <h2>FTHS LMS Teacher</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="classes.html"><i class="fas fa-chalkboard"></i> My Classes</a>
+                    </li>
+                    <li>
+                        <a href="students.html"><i class="fas fa-users"></i> My Students</a>
+                    </li>
+                    <li class="active">
+                        <a href="attendance.html"><i class="fas fa-clipboard-check"></i> Attendance</a>
+                    </li>
+                    <li>
+                        <a href="grades.html"><i class="fas fa-graduation-cap"></i> Gradebook</a>
+                    </li>
+                    <li>
+                        <a href="assignments.html"><i class="fas fa-tasks"></i> Assignments</a>
+                    </li>
+                    <li>
+                        <a href="resources.html"><i class="fas fa-book-open"></i> Learning Resources</a>
+                    </li>
+                    <li>
+                        <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="teacher-main">
+            <header class="teacher-header">
+                <div class="header-left">
+                    <h1 id="classTitle">Class Attendance</h1>
+                    <p>Viewing attendance for <span id="className">[Class Name]</span></p>
+                </div>
+                <div class="header-right">
+                    <div id="currentDateTime" class="datetime-display"></div>
+                </div>
+            </header>
+
+            <!-- Attendance Content -->
+            <div class="attendance-header">
+                <div class="attendance-actions">
+                    <div class="date-selector">
+                        <button id="prevDateBtn"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="currentDate">Today, May 15, 2023</h3>
+                        <button id="nextDateBtn"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="attendance-container">
+                <div class="attendance-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon present">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Present</h3>
+                            <p id="presentCount">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon absent">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Absent</h3>
+                            <p id="absentCount">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon late">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Late</h3>
+                            <p id="lateCount">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon excused">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Excused</h3>
+                            <p id="excusedCount">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="attendance-table-container">
+                    <table id="attendanceTable">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="loading-row">
+                                <td colspan="5">
+                                    <i class="fas fa-spinner fa-spin"></i> Loading attendance data...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Take Attendance Modal -->
+    <div id="takeAttendanceModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Take Attendance</h2>
+                <p id="attendanceDate">For May 15, 2023</p>
+            </div>
+            <div class="attendance-form">
+                <div class="attendance-students-list">
+                    <h3>Students</h3>
+                    <div class="student-attendance-container" id="studentAttendanceList">
+                        <!-- Students will be populated here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="submitAttendanceBtn" class="btn-primary">
+                    <i class="fas fa-save"></i> Save Attendance
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Change Password</h2>
+                <p>Secure your account with a new password</p>
+            </div>
+            <form id="changePasswordForm">
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="currentPassword" placeholder="Current Password" required>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-key input-icon"></i>
+                    <input type="password" id="newPassword" placeholder="New Password" required>
+                </div>
+                <div class="password-strength">
+                    <span>Strength:</span>
+                    <div class="strength-meter">
+                        <div class="strength-meter-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-check-circle input-icon"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" required>
+                </div>
+                
+                <button type="submit">
+                    <i class="fas fa-sync-alt" style="margin-right: 8px;"></i>
+                    Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/attendance.js"></script>
+</body>
+</html>

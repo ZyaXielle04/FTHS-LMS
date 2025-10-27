@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTHS LMS - Student Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <button class="burger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="student-container">
+        <!-- Sidebar Navigation -->
+        <aside class="student-sidebar">
+            <div class="sidebar-header">
+                <img src="../images/FTHS-logo.jpg" alt="FTHS Logo" class="logo">
+                <h2>FTHS LMS Student</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="classes.html"><i class="fas fa-chalkboard"></i> My Classes</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="student-main">
+            <header class="student-header">
+                <div class="header-left">
+                    <h1>Dashboard</h1>
+                    <p>Welcome, <span id="studentName">[Student Name]</span>!</p>
+                </div>
+                <div class="header-right">
+                    <div id="currentDateTime" class="datetime-display"></div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon class-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Current Classes</h3>
+                        <p id="currentClassesCount">6</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon assignment-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Pending Assignments</h3>
+                        <p id="pendingAssignmentsCount">5</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon attendance-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Attendance Rate</h3>
+                        <p id="attendanceRate">96%</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-row">
+                <div class="upcoming-classes">
+                    <h2><i class="fas fa-calendar-day"></i> Today's Schedule</h2>
+                    <div class="schedule-list" id="todaysSchedule">
+                        <div class="schedule-item">
+                            <div class="class-time">8:00 AM - 9:30 AM</div>
+                            <div class="class-info">
+                                <h3>Mathematics</h3>
+                                <p>Mr. Smith | Room 203</p>
+                            </div>
+                            <button class="join-class-btn">Join Class</button>
+                        </div>
+                        <div class="schedule-item">
+                            <div class="class-time">10:00 AM - 11:30 AM</div>
+                            <div class="class-info">
+                                <h3>Physics</h3>
+                                <p>Ms. Johnson | Lab 105</p>
+                            </div>
+                            <button class="join-class-btn">Join Class</button>
+                        </div>
+                    </div>
+                    
+                    <h2><i class="fas fa-clock"></i> Upcoming Assignments</h2>
+                    <div class="assignments-list">
+                        <div class="assignment-item">
+                            <div class="assignment-due">
+                                <span class="due-date">Due Tomorrow</span>
+                                <span class="subject-tag math-tag">Math</span>
+                            </div>
+                            <div class="assignment-info">
+                                <h3>Algebra Chapter 5 Exercises</h3>
+                                <p>Problems 1-20 from textbook</p>
+                            </div>
+                            <button class="view-assignment-btn">View Details</button>
+                        </div>
+                        <div class="assignment-item">
+                            <div class="assignment-due">
+                                <span class="due-date">Due in 3 days</span>
+                                <span class="subject-tag science-tag">Science</span>
+                            </div>
+                            <div class="assignment-info">
+                                <h3>Physics Lab Report</h3>
+                                <p>Experiment on Newton's Laws</p>
+                            </div>
+                            <button class="view-assignment-btn">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Change Password</h2>
+                <p>Secure your account with a new password</p>
+            </div>
+            <form id="changePasswordForm">
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="currentPassword" placeholder="Current Password" required>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-key input-icon"></i>
+                    <input type="password" id="newPassword" placeholder="New Password" required>
+                </div>
+                <div class="password-strength">
+                    <span>Strength:</span>
+                    <div class="strength-meter">
+                        <div class="strength-meter-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-check-circle input-icon"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" required>
+                </div>
+                
+                <button type="submit">
+                    <i class="fas fa-sync-alt" style="margin-right: 8px;"></i>
+                    Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="../overdue-checker.js"></script>
+</body>
+</html>

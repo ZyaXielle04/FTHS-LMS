@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTHS LMS - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="../images/FTHS-logo.jpg" alt="FTHS Logo" class="logo">
+                <h2>FTHS LMS Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="students.html"><i class="fas fa-users"></i> Student Management</a>
+                    </li>
+                    <li class="active">
+                        <a href="teachers.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Management</a>
+                    </li>
+                    <li>
+                        <a href="sections.html"><i class="fas fa-columns"></i> Section Management</a>
+                    </li>
+                    <li>
+                        <a href="subjects.html"><i class="fas fa-book"></i> Subject Management</a>
+                    </li>
+                    <li>
+                        <a href="curriculums.html"><i class="fas fa-folder-open"></i> Curriculum Management</a>
+                    </li>
+                    <li>
+                        <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div class="header-left">
+                    <h1>Dashboard</h1>
+                    <p class="welcome-message">Welcome back, Admin!</p>
+                </div>
+                <div class="header-right">
+                    <div id="currentDateTime" class="datetime-display"></div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Students</h3>
+                        <p class="stat-number" id="totalStudents">1,245</p>
+                        <p class="stat-change positive"><i class="fas fa-arrow-up"></i> 5.2% from last month</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-green">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Teachers</h3>
+                        <p class="stat-number" id="totalTeachers">48</p>
+                        <p class="stat-change positive"><i class="fas fa-arrow-up"></i> 2.1% from last month</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-purple">
+                        <i class="fas fa-columns"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Active Sections</h3>
+                        <p class="stat-number" id="totalSections">32</p>
+                        <p class="stat-change neutral"><i class="fas fa-minus"></i> No change</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-orange">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Subjects Offered</h3>
+                        <p class="stat-number" id="totalSubjects">56</p>
+                        <p class="stat-change negative"><i class="fas fa-arrow-down"></i> 1.8% from last term</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-row">
+                <div class="recent-activity">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-bell"></i> Recent Activities</h3>
+                        </div>
+                        <div class="card-body">
+                            <ul class="activity-list">
+                                <li>
+                                    <div class="activity-icon bg-blue">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <p>New student registered - Juan Dela Cruz</p>
+                                        <span class="activity-time">10 minutes ago</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="activity-icon bg-green">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <p>New subject added - Advanced Mathematics</p>
+                                        <span class="activity-time">2 hours ago</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="activity-icon bg-purple">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <p>Teacher Maria Santos updated her profile</p>
+                                        <span class="activity-time">5 hours ago</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="activity-icon bg-orange">
+                                        <i class="fas fa-columns"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <p>New section created - Grade 11 STEM A</p>
+                                        <span class="activity-time">Yesterday</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="activity-icon bg-red">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <p>System maintenance scheduled for tomorrow</p>
+                                        <span class="activity-time">2 days ago</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="upcoming-events">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-calendar-alt"></i> Upcoming Events</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="event-item">
+                                <div class="event-date bg-blue">
+                                    <span class="event-day">15</span>
+                                    <span class="event-month">JUN</span>
+                                </div>
+                                <div class="event-details">
+                                    <h4>Final Examinations</h4>
+                                    <p>All sections - Main Building</p>
+                                    <span class="event-time">8:00 AM - 5:00 PM</span>
+                                </div>
+                            </div>
+                            <div class="event-item">
+                                <div class="event-date bg-green">
+                                    <span class="event-day">20</span>
+                                    <span class="event-month">JUN</span>
+                                </div>
+                                <div class="event-details">
+                                    <h4>Teachers' Conference</h4>
+                                    <p>Faculty Room</p>
+                                    <span class="event-time">9:00 AM - 12:00 PM</span>
+                                </div>
+                            </div>
+                            <div class="event-item">
+                                <div class="event-date bg-purple">
+                                    <span class="event-day">25</span>
+                                    <span class="event-month">JUN</span>
+                                </div>
+                                <div class="event-details">
+                                    <h4>School Recognition Day</h4>
+                                    <p>School Gymnasium</p>
+                                    <span class="event-time">1:00 PM - 4:00 PM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Dashboard Section -->
+            <div class="dashboard-row">
+                <div class="system-status">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-server"></i> System Status</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="status-item">
+                                <div class="status-indicator active"></div>
+                                <span>Database Connection</span>
+                                <span class="status-value">Active</span>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator active"></div>
+                                <span>Server Load</span>
+                                <span class="status-value">Normal (32%)</span>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator warning"></div>
+                                <span>Storage Space</span>
+                                <span class="status-value">75% used</span>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator active"></div>
+                                <span>Last Backup</span>
+                                <span class="status-value">Today, 2:00 AM</span>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator inactive"></div>
+                                <span>Maintenance Mode</span>
+                                <span class="status-value">Inactive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Change Password</h2>
+                <p>Secure your account with a new password</p>
+            </div>
+            <form id="changePasswordForm">
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="currentPassword" placeholder="Current Password" required>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-key input-icon"></i>
+                    <input type="password" id="newPassword" placeholder="New Password" required>
+                </div>
+                <div class="password-strength">
+                    <span>Strength:</span>
+                    <div class="strength-meter">
+                        <div class="strength-meter-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-check-circle input-icon"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" required>
+                </div>
+                
+                <button type="submit">
+                    <i class="fas fa-sync-alt" style="margin-right: 8px;"></i>
+                    Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/create-class.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

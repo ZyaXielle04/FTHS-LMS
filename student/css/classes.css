@@ -1,0 +1,597 @@
+/* Classes Page Styles */
+.classes-container {
+    padding: 20px;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.classes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.semester-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    padding: 8px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.semester-selector label {
+    font-weight: 600;
+    color: #555;
+    white-space: nowrap;
+}
+
+.semester-selector select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.semester-selector select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Class Cards Grid */
+.class-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.loading-spinner {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: #777;
+    font-size: 1.1rem;
+}
+
+.loading-spinner i {
+    margin-right: 10px;
+}
+
+.no-classes, .error-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    color: #555;
+    font-size: 1.1rem;
+}
+
+.error-message {
+    color: #e74c3c;
+}
+
+.class-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.class-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.class-header {
+    padding: 20px;
+    position: relative;
+    color: white;
+    min-height: 100px;
+}
+
+.class-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    max-width: 80%;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.class-header .class-code {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    opacity: 0.9;
+    background: rgba(0,0,0,0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.class-info {
+    padding: 20px;
+    background: #fff;
+    flex-grow: 1;
+}
+
+.class-info p {
+    margin: 0 0 12px;
+    font-size: 0.95rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+}
+
+.class-info p:last-child {
+    margin-bottom: 0;
+}
+
+.class-info i {
+    margin-right: 10px;
+    width: 18px;
+    text-align: center;
+    color: #777;
+    font-size: 0.9em;
+}
+
+.class-stats {
+    display: flex;
+    border-top: 1px solid #eee;
+    background: #f9f9f9;
+}
+
+.class-stats .stat {
+    flex: 1;
+    text-align: center;
+    padding: 15px 10px;
+    transition: background 0.2s;
+}
+
+.class-stats .stat:hover {
+    background: #f0f0f0;
+}
+
+.class-stats .stat:not(:last-child) {
+    border-right: 1px solid #eee;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 3px;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.class-actions {
+    display: flex;
+    border-top: 1px solid #eee;
+}
+
+.class-actions button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.class-actions button:hover {
+    background: #f5f5f5;
+}
+
+.class-actions button i {
+    margin-right: 8px;
+    font-size: 0.9em;
+}
+
+.class-actions .btn-view {
+    color: #3498db;
+}
+
+.class-actions .btn-resources {
+    color: #2ecc71;
+}
+
+/* Subject-specific card colors */
+.math-card .class-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.physical-card .class-header {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+.english-card .class-header {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.history-card .class-header {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+}
+
+.chemistry-card .class-header {
+    background: linear-gradient(135deg, #1abc9c, #16a085);
+}
+
+.cs-card .class-header {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+}
+
+.biology-card .class-header {
+    background: linear-gradient(135deg, #27ae60, #219653);
+}
+
+.art-card .class-header {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+.music-card .class-header {
+    background: linear-gradient(135deg, #e84393, #fd79a8);
+}
+
+.default-card .class-header {
+    background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+}
+
+/* Schedule Table Styles */
+.class-details-section {
+    margin-top: 40px;
+    animation: fadeInUp 0.6s ease;
+}
+
+.class-schedule {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.class-schedule h3 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.4rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.class-schedule h3 i {
+    margin-right: 12px;
+    color: #3498db;
+}
+
+.schedule-table {
+    overflow-x: auto;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.schedule-table table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.schedule-table th {
+    background: #f8f9fa;
+    padding: 12px 5px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #495057;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 2px solid #e9ecef;
+    width: 20%;
+}
+
+.schedule-table td {
+    padding: 0;
+    height: 100px;
+    border: 1px solid #e9ecef;
+    vertical-align: top;
+    position: relative;
+    width: 20%;
+}
+
+.schedule-block {
+    padding: 8px;
+    margin: 4px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    height: calc(100% - 8px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.schedule-block .subject-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.schedule-block .class-room {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Color classes for schedule blocks */
+.schedule-block.math-card {
+    background-color: rgba(52, 152, 219, 0.15);
+    border-left: 3px solid #3498db;
+}
+
+.schedule-block.physical-card {
+    background-color: rgba(155, 89, 182, 0.15);
+    border-left: 3px solid #9b59b6;
+}
+
+.schedule-block.english-card {
+    background-color: rgba(231, 76, 60, 0.15);
+    border-left: 3px solid #e74c3c;
+}
+
+.schedule-block.history-card {
+    background-color: rgba(230, 126, 34, 0.15);
+    border-left: 3px solid #e67e22;
+}
+
+.schedule-block.chemistry-card {
+    background-color: rgba(26, 188, 156, 0.15);
+    border-left: 3px solid #1abc9c;
+}
+
+.schedule-block.cs-card {
+    background-color: rgba(52, 73, 94, 0.15);
+    border-left: 3px solid #34495e;
+}
+
+.schedule-block.biology-card {
+    background-color: rgba(39, 174, 96, 0.15);
+    border-left: 3px solid #27ae60;
+}
+
+.schedule-block.art-card {
+    background-color: rgba(243, 156, 18, 0.15);
+    border-left: 3px solid #f39c12;
+}
+
+.schedule-block.music-card {
+    background-color: rgba(232, 67, 147, 0.15);
+    border-left: 3px solid #e84393;
+}
+
+.schedule-block.default-card {
+    background-color: rgba(127, 140, 141, 0.15);
+    border-left: 3px solid #7f8c8d;
+}
+
+.no-schedule {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+    font-style: italic;
+}
+
+.class-time {
+    font-size: 0.8rem;
+    color: #555;
+    margin: 3px 0;
+}
+
+/* In schedule blocks */
+.schedule-block .class-time {
+    font-size: 0.75rem;
+    color: #666;
+    margin: 2px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .class-cards {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .classes-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .semester-selector {
+        justify-content: space-between;
+    }
+    
+    .class-card {
+        min-width: 0;
+    }
+    
+    .class-info p {
+        font-size: 0.9rem;
+    }
+
+    .schedule-table {
+        min-width: 100%;
+    }
+    
+    .schedule-table td {
+        height: 80px;
+    }
+}
+
+@media (max-width: 576px) {
+    .classes-container {
+        padding: 15px;
+    }
+    
+    .class-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .class-actions {
+        flex-direction: column;
+    }
+    
+    .class-actions button {
+        padding: 12px;
+    }
+    
+    .schedule-table td {
+        height: 60px;
+    }
+
+    .schedule-block {
+        padding: 4px;
+    }
+
+    .schedule-block .subject-name {
+        font-size: 0.8rem;
+    }
+    
+    .schedule-block .class-room {
+        font-size: 0.7rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header Styles */
+.student-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-left h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.3rem;
+}
+
+.header-left p {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.notification-bell {
+    position: relative;
+    cursor: pointer;
+    color: #2c3e50;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.notification-bell:hover {
+    color: #3498db;
+    transform: translateY(-2px);
+}
+
+.notification-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .student-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+    }
+    
+    .header-right {
+        margin-top: 1rem;
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .header-left h1 {
+        font-size: 1.5rem;
+    }
+}
+
+.grade-updated {
+    animation: gradePulse 1s;
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+@keyframes gradePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}

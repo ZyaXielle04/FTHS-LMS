@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTHS LMS - Gradebook</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/grades.css">
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <button class="burger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="teacher-container">
+        <!-- Sidebar Navigation -->
+        <aside class="teacher-sidebar">
+            <div class="sidebar-header">
+                <img src="../images/FTHS-logo.jpg" alt="FTHS Logo" class="logo">
+                <h2>FTHS LMS Teacher</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="classes.html"><i class="fas fa-chalkboard"></i> My Classes</a></li>
+                    <li><a href="students.html"><i class="fas fa-users"></i> My Students</a></li>
+                    <li><a href="attendance.html"><i class="fas fa-clipboard-check"></i> Attendance</a></li>
+                    <li class="active"><a href="grades.html"><i class="fas fa-graduation-cap"></i> Gradebook</a></li>
+                    <li><a href="assignments.html"><i class="fas fa-tasks"></i> Assignments</a></li>
+                    <li><a href="resources.html"><i class="fas fa-book-open"></i> Learning Resources</a></li>
+                    <li><a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="teacher-main">
+            <header class="teacher-header">
+                <div class="header-left">
+                    <h1>Gradebook</h1>
+                    <h2 id="classNameDisplay" class="class-title"></h2>
+                    <p>View student grades and performance</p>
+                </div>
+                <div class="header-right">
+                    <div id="currentDateTime" class="datetime-display"></div>
+                </div>
+            </header>
+
+            <!-- Grades Content -->
+            <div class="grades-container">
+                <div class="grades-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="studentSearch" placeholder="Search students...">
+                    </div>
+                </div>
+
+                <div class="student-cards-container" id="studentCards">
+                    <!-- Loading placeholder -->
+                    <div class="loading-placeholder">
+                        <i class="fas fa-spinner fa-spin"></i> Loading student data...
+                    </div>
+                    
+                    <!-- Student cards will be populated here -->
+                    <!-- Example card structure:
+                    <div class="student-card">
+                        <div class="student-avatar">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="student-info">
+                            <h3>John Doe</h3>
+                            <p>Grade 10 - Section A</p>
+                        </div>
+                        <div class="grade-average">
+                            <div class="average-circle" style="background-color: #4CAF50;">
+                                <span>85%</span>
+                            </div>
+                            <p>Overall Average</p>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-view" data-student-id="12345">
+                                <i class="fas fa-eye"></i> View Grades
+                            </button>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Grade Detail Modal -->
+    <div id="gradeDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeGradeModal">&times;</span>
+            <h2 id="studentGradeTitle">Student Grades</h2>
+            
+            <div class="student-info">
+                <p><strong>Name:</strong> <span id="studentName"></span></p>
+                <p><strong>Class:</strong> <span id="studentClass"></span></p>
+                <p id="attendancePercentage"><strong>Attendance:</strong> <span class="attendance-value"></span></p>
+            </div>
+            
+            <div id="studentAverage" class="grade-average"></div>
+            
+            <table class="grades-table">
+                <thead>
+                    <tr>
+                        <th>Assignment</th>
+                        <th>Type</th>
+                        <th>Submitted</th>
+                        <th>Score</th>
+                        <th>Grade</th>
+                        <th>Weight</th>
+                    </tr>
+                </thead>
+                <tbody id="gradesTableBody"></tbody>
+            </table>
+            
+            <button id="printGradeReport" class="btn-print">
+                <i class="fas fa-print"></i> Print Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Change Password</h2>
+                <p>Secure your account with a new password</p>
+            </div>
+            <form id="changePasswordForm">
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="currentPassword" placeholder="Current Password" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-key input-icon"></i>
+                    <input type="password" id="newPassword" placeholder="New Password" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-check-circle input-icon"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" required>
+                </div>
+                <button type="submit">
+                    <i class="fas fa-sync-alt" style="margin-right: 8px;"></i>
+                    Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="../firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/grades.js"></script>
+</body>
+</html>

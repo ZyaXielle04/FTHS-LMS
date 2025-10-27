@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTHS LMS - Assignments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/assignments.css">
+    
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <button class="burger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="teacher-container">
+        <!-- Sidebar Navigation -->
+        <aside class="teacher-sidebar">
+            <div class="sidebar-header">
+                <img src="../images/FTHS-logo.jpg" alt="FTHS Logo" class="logo">
+                <h2>FTHS LMS Teacher</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="classes.html"><i class="fas fa-chalkboard"></i> My Classes</a>
+                    </li>
+                    <li>
+                        <a href="students.html"><i class="fas fa-users"></i> My Students</a>
+                    </li>
+                    <li>
+                        <a href="attendance.html"><i class="fas fa-clipboard-check"></i> Attendance</a>
+                    </li>
+                    <li>
+                        <a href="grades.html"><i class="fas fa-graduation-cap"></i> Gradebook</a>
+                    </li>
+                    <li class="active">
+                        <a href="assignments.html"><i class="fas fa-tasks"></i> Assignments</a>
+                    </li>
+                    <li>
+                        <a href="resources.html"><i class="fas fa-book-open"></i> Learning Resources</a>
+                    </li>
+                    <li>
+                        <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="teacher-main">
+            <header class="teacher-header">
+                <div class="header-left">
+                    <h1>Assignments</h1>
+                    <p>Manage and track student assignments</p>
+                </div>
+                <div class="header-right">
+                    <div id="currentDateTime" class="datetime-display"></div>
+                </div>
+            </header>
+
+            <!-- Assignments Content -->
+        <div class="assignments-controls">
+            <div class="assignment-actions">
+                <button class="btn btn-primary" id="addHomeworkBtn">
+                    <i class="fas fa-book"></i> Add Homework
+                </button>
+                <button class="btn btn-secondary" id="addQuizBtn">
+                    <i class="fas fa-question-circle"></i> Add Quiz
+                </button>
+                <button class="btn btn-danger" id="addExamBtn">
+                    <i class="fas fa-file-alt"></i> Add Major Exam
+                </button>
+            </div>
+        </div>
+
+        <div class="assignments-container" id="assignmentsList">
+            <!-- Assignments will be populated here from Firebase -->
+        </div>
+    </main>
+
+    <!-- Assignment Creation Modal -->
+    <div id="assignmentModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalAssignmentTitle">Create New Assignment</h2>
+                <p id="modalAssignmentSubtitle">Fill in the details for your new assignment</p>
+            </div>
+            <form id="assignmentForm">
+                <input type="hidden" id="assignmentType">
+                
+                <div class="form-group">
+                    <label for="assignmentTitle">Title:</label>
+                    <input type="text" id="assignmentTitle" required>
+                </div>
+                    
+                <div class="form-group">
+                    <label for="assignmentDueDate">Due Date:</label>
+                    <input type="datetime-local" id="assignmentDueDate" required>
+                </div>
+                
+                <div id="pointsField" class="form-group" style="display: none;">
+                    <label for="assignmentPoints">Total Points:</label>
+                    <input type="number" id="assignmentPoints" class="form-control" min="1" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label for="assignmentDescription">Description:</label>
+                    <textarea id="assignmentDescription" rows="4"></textarea>
+                </div>
+                
+                <!-- Quiz/Exam Specific Fields -->
+                <div id="quizFields" class="assignment-type-fields" style="display:none;">
+                    <div class="quiz-items-container" id="quizItemsContainer">
+                        <div class="quiz-item-header">
+                            <h4>Quiz Items</h4>
+                            <button type="button" class="btn btn-sm btn-add-item" id="addQuizItem">
+                                <i class="fas fa-plus"></i> Add Item
+                            </button>
+                        </div>
+                        <div class="quiz-items-list" id="quizItemsList">
+                            <!-- Quiz items will be added here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelAssignment">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitAssignment">Create Assignment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quiz Item Modal -->
+    <div id="quizItemModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Add Quiz Item</h2>
+                <p>Configure your quiz question</p>
+            </div>
+            <form id="quizItemForm">
+                <div class="form-group">
+                    <label for="itemType">Question Type:</label>
+                    <select id="itemType" required>
+                        <option value="mcq_single">Multiple Choice (Single Answer)</option>
+                        <option value="mcq_multiple">Multiple Choice (Multiple Answers)</option>
+                        <option value="true_false">True or False</option>
+                        <option value="enumeration">Enumeration</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemQuestion">Question:</label>
+                    <textarea id="itemQuestion" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemPoints">Points:</label>
+                    <input type="number" id="itemPoints" min="1" value="1" required>
+                </div>
+                
+                <div id="mcqOptionsContainer" style="display:none;">
+                    <div class="form-group">
+                        <label>Options:</label>
+                        <div id="mcqOptionsList">
+                            <div class="mcq-option">
+                                <input type="text" class="mcq-option-text" placeholder="Option text">
+                                <div class="mcq-option-actions">
+                                    <button type="button" class="btn-icon btn-remove-option"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm" id="addMcqOption">
+                            <i class="fas fa-plus"></i> Add Option
+                        </button>
+                    </div>
+                    
+                    <div class="form-group" id="correctAnswerContainer">
+                        <label for="correctAnswer">Correct Answer:</label>
+                        <div id="correctAnswerOptions">
+                            <!-- Options will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="trueFalseContainer" style="display:none;">
+                    <div class="form-group">
+                        <label>Correct Answer:</label>
+                        <div class="true-false-options">
+                            <label>
+                                <input type="radio" name="trueFalseAnswer" value="true" checked> True
+                            </label>
+                            <label>
+                                <input type="radio" name="trueFalseAnswer" value="false"> False
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelQuizItem">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Change Password</h2>
+                <p>Secure your account with a new password</p>
+            </div>
+            <form id="changePasswordForm">
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="currentPassword" placeholder="Current Password" required>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-key input-icon"></i>
+                    <input type="password" id="newPassword" placeholder="New Password" required>
+                </div>
+                <div class="password-strength">
+                    <span>Strength:</span>
+                    <div class="strength-meter">
+                        <div class="strength-meter-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-check-circle input-icon"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" required>
+                </div>
+                
+                <button type="submit">
+                    <i class="fas fa-sync-alt" style="margin-right: 8px;"></i>
+                    Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="../firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/assignments.js"></script>
+    <script src="../overdue-checker.js"></script>
+</body>
+</html>
