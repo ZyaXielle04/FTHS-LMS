@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTHS LMS - Section Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/sections.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <!-- Load Firebase using CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="../images/FTHS-logo.jpg" alt="FTHS Logo" class="logo">
+                <h2>FTHS LMS Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="students.html"><i class="fas fa-users"></i> Student Management</a>
+                    </li>
+                    <li class="active">
+                        <a href="teachers.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Management</a>
+                    </li>
+                    <li>
+                        <a href="sections.html"><i class="fas fa-columns"></i> Section Management</a>
+                    </li>
+                    <li>
+                        <a href="subjects.html"><i class="fas fa-book"></i> Subject Management</a>
+                    </li>
+                    <li>
+                        <a href="curriculums.html"><i class="fas fa-folder-open"></i> Curriculum Management</a>
+                    </li>
+                    <li>
+                        <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
+                    </li>
+                    <li>
+                        <a ><i class="fas fa-user-plus"></i>My Profile</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div class="header-left">
+                    <h1>Section Management</h1>
+                </div>
+                <div class="header-right">
+                    <div id="currentDateTime" class="datetime-display"></div>
+                </div>
+            </header>
+
+            <!-- Section Management Content -->
+            <div class="section-header">
+                <h2>Section Manager</h2>
+                <div class="section-actions">
+                    <button class="btn-primary" id="addNewSectionBtn">
+                        <i class="fas fa-plus"></i> Add New Section
+                    </button>
+                    <div class="search-box">
+                        <input type="text" placeholder="Search sections..." id="sectionSearch">
+                        <button id="searchBtn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="filter-options">
+                        <select id="gradeLevelFilter">
+                            <option value="">All Grade Levels</option>
+                            <option value="11">Grade 11</option>
+                            <option value="12">Grade 12</option>
+                        </select>
+                        <select id="strandFilter">
+                            <option value="">All Strands</option>
+                            <option value="STEM">STEM</option>
+                            <option value="ABM">ABM</option>
+                            <option value="HUMSS">HUMSS</option>
+                            <option value="GAS">GAS</option>
+                            <option value="TVL">TVL</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sections-table-container">
+                <table class="data-table" id="sectionsTable">
+                    <thead>
+                        <tr>
+                            <th>Section Name</th>
+                            <th>Students</th>
+                            <th>Homeroom Adviser</th>
+                            <th>Batch</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sectionsTableBody">
+                        <!-- Sections will be loaded dynamically from Firebase -->
+                    </tbody>
+                </table>
+                <div class="table-footer">
+                    <div class="table-pagination">
+                        <button class="pagination-btn" id="prevPageBtn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="pageInfo">Page 1 of 1</span>
+                        <button class="pagination-btn" id="nextPageBtn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Add/Edit Section Modal -->
+        <div class="modal" id="sectionModal">
+            <div class="modal-content">
+                <h2 id="modalTitle">Add New Section</h2>
+                <form id="sectionForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gradeLevel">Grade Level</label>
+                            <select id="gradeLevel" required>
+                                <option value="">Select Grade</option>
+                                <option value="11">Grade 11</option>
+                                <option value="12">Grade 12</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="strand">Strand</label>
+                            <select id="strand" required>
+                                <option value="">Select Strand</option>
+                                <option value="STEM">STEM</option>
+                                <option value="ABM">ABM</option>
+                                <option value="HUMSS">HUMSS</option>
+                                <option value="GAS">GAS</option>
+                                <option value="TVL">TVL</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sectionNumber">Section Number</label>
+                            <input type="number" id="sectionNumber" min="1" max="20" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="homeroomAdviser">Homeroom Adviser</label>
+                        <select id="homeroomAdviser" required>
+                            <option value="">Select Teacher</option>
+                            <!-- Teachers will be loaded dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="batchYear">Batch Year</label>
+                        <select id="batchYear" required>
+                            <option value="">Select Batch</option>
+                            <!-- Current and next year will be options -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="graduated">Graduated</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelSectionBtn">Cancel</button>
+                        <button type="submit" class="btn-primary" id="saveSectionBtn">Save Section</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Timetable Modal -->
+        <div class="modal" id="timetableModal">
+            <div class="modal-content" style="max-width: 900px;">
+                <h2 id="timetableModalTitle">Section Timetable</h2>
+                <div class="timetable-container">
+                    <table class="data-table" id="timetableTable">
+                        <thead>
+                            <tr>
+                                <th>Subject Name</th>
+                                <th>Subject ID</th>
+                                <th>Teacher</th>
+                                <th>Days</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timetableTableBody">
+                            <!-- Timetable will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="closeTimetableBtn">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your configuration -->
+    <script src="../firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/create-class.js"></script>
+    <script src="js/sections.js"></script>
+</body>
+</html>

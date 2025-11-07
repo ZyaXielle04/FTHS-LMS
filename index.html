@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTHS | Login Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <link rel="icon" href="images/FTHS-logo.jpg" type="image/x-icon">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <img src="images/FTHS-logo.jpg" alt="FTHS Logo" class="logo">
+            <h1>Florentino Torres <br> High School</h1>
+            <h2>Learning Management System</h2>
+        </div>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="loginId">Email or Student ID</label>
+                <input type="text" id="loginId" name="loginId" placeholder="Enter your email or Student ID" required>
+                <div id="loginError" class="error-message"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <div id="passwordError" class="error-message"></div>
+            </div>
+            
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember"> Remember me
+                </label>
+                <a href="#" class="forgot-password" id="resetPassword">Forgot password?</a>
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">Login</button>
+        </form>
+        
+        <div class="login-footer">
+            <p>&copy; FTHS-LMS Powered by <b>ZyaCodes</b></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

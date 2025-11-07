@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTHS LMS - Student Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/students.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <!-- Load Firebase using CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="../images/FTHS-logo.jpg" alt="FTHS Logo" class="logo">
+                <h2>FTHS LMS Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="students.html"><i class="fas fa-users"></i> Student Management</a>
+                    </li>
+                    <li class="active">
+                        <a href="teachers.html"><i class="fas fa-chalkboard-teacher"></i> Teacher Management</a>
+                    </li>
+                    <li>
+                        <a href="sections.html"><i class="fas fa-columns"></i> Section Management</a>
+                    </li>
+                    <li>
+                        <a href="subjects.html"><i class="fas fa-book"></i> Subject Management</a>
+                    </li>
+                    <li>
+                        <a href="curriculums.html"><i class="fas fa-folder-open"></i> Curriculum Management</a>
+                    </li>
+                    <li>
+                        <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
+                    </li>
+                    <li>
+                        <a ><i class="fas fa-user-plus"></i>My Profile</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div class="header-left">
+                    <h1>Student Management</h1>
+                </div>
+                <div class="header-right">
+                    <div id="currentDateTime" class="datetime-display"></div>
+                </div>
+            </header>
+
+            <!-- Student Management Content -->
+            <div class="section-header">
+                <h2>Student Profiles</h2>
+                <div class="section-actions">
+                    <div class="section-actions">
+                        <button class="btn-primary" id="addNewStudentBtn">
+                            <i class="fas fa-plus"></i> Add New Student
+                        </button>
+                        <div class="search-box">
+                            <input type="text" placeholder="Search students..." id="studentSearch">
+                            <button id="searchBtn"><i class="fas fa-search"></i></button>
+                        </div>
+                        <!-- Add this bulk actions dropdown -->
+                        <div class="bulk-actions">
+                            <button class="btn-secondary" id="bulkActionsBtn">
+                                <i class="fas fa-tasks"></i> Bulk Actions
+                            </button>
+                            <div class="bulk-actions-dropdown" id="bulkActionsDropdown">
+                                <div class="dropdown-header">Update Status</div>
+                                <button class="dropdown-item" data-status="active">
+                                    <i class="fas fa-check-circle"></i> Mark as Enrolled
+                                </button>
+                                <button class="dropdown-item" data-status="inactive">
+                                    <i class="fas fa-times-circle"></i> Mark as Not Enrolled
+                                </button>
+                                <button class="dropdown-item" data-status="transferred">
+                                    <i class="fas fa-exchange-alt"></i> Mark as Transferred
+                                </button>
+                                <button class="dropdown-item" data-status="graduated">
+                                    <i class="fas fa-graduation-cap"></i> Mark as Graduated
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" id="selectAllBtn">
+                                    <i class="fas fa-check-square"></i> Select All
+                                </button>
+                                <button class="dropdown-item" id="clearSelectionBtn">
+                                    <i class="fas fa-times-circle"></i> Clear Selection
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="students-table-container">
+                <table class="data-table" id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAllCheckbox"></th>
+                            <th>Student ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Section</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <!-- Students will be loaded here -->
+                    </tbody>
+                </table>
+                <div class="table-footer">
+                    <div class="table-pagination">
+                        <button class="pagination-btn" id="prevPageBtn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="pageInfo">Page 1 of 1</span>
+                        <button class="pagination-btn" id="nextPageBtn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Add/Edit Student Modal -->
+        <div class="modal" id="studentModal">
+            <div class="modal-content">
+                <h2 id="modalTitle">Add New Student</h2>
+                <form id="studentForm">
+                    <div class="form-group">
+                        <label for="studentId">Student ID&nbsp&nbsp&nbsp<small class="hint" style="display: inline; color: red;">Auto-generated</small></label>
+                        <input type="text" id="studentId" required readonly disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="section">Section</label>
+                        <select id="section" required>
+                            <option value="">Select Section</option>
+                            <!-- Sections will be populated here -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" required>
+                            <option value="inactive">Not Enrolled Yet</option>
+                            <option value="active">Enrolled</option>
+                            <option value="transferred">Transferred</option>
+                            <option value="graduated">Graduated</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelStudentBtn">Cancel</button>
+                        <button type="submit" class="btn-primary" id="saveStudentBtn">Save Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your configuration -->
+    <script src="../firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/create-class.js"></script>
+    <script src="js/students.js"></script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTHS LMS - Announcements</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/announcements.css">
+    
+</head>
+<body>
+    <div class="sidebar-overlay"></div>
+    <button class="burger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="teacher-container">
+        <!-- Sidebar Navigation -->
+        <aside class="teacher-sidebar">
+            <div class="sidebar-header">
+                <img src="../images/FTHS-logo.jpg" alt="FTHS Logo" class="logo">
+                <h2>FTHS LMS Teacher</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="classes.html"><i class="fas fa-chalkboard"></i> My Classes</a>
+                    </li>
+                    <li>
+                        <a href="students.html"><i class="fas fa-users"></i> My Students</a>
+                    </li>
+                    <li>
+                        <a href="attendance.html"><i class="fas fa-clipboard-check"></i> Attendance</a>
+                    </li>
+                    <li>
+                        <a href="grades.html"><i class="fas fa-graduation-cap"></i> Gradebook</a>
+                    </li>
+                    <li>
+                        <a href="assignments.html"><i class="fas fa-tasks"></i> Assignments</a>
+                    </li>
+                    <li>
+                        <a href="resources.html"><i class="fas fa-book-open"></i> Learning Resources</a>
+                    </li>
+                    <li class="active">
+                        <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="teacher-main">
+            <header class="teacher-header">
+                <div class="header-left">
+                    <h1>Announcements</h1>
+                    <p>Create and manage announcements</p>
+                </div>
+                <div class="header-right">
+                    <div id="currentDateTime" class="datetime-display"></div>
+                </div>
+            </header>
+
+            <!-- Announcements Content -->
+            <div class="announcements-header">
+                <button id="addNewAnnouncementBtn" class="btn-primary">
+                    <i class="fas fa-plus"></i> New Announcement
+                </button>
+                
+                <div class="announcements-search-filter">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="announcementSearch" placeholder="Search announcements...">
+                        <button id="searchBtn" class="btn-icon">
+                        </button>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select class="filter-select" id="audienceFilter">
+                            <option value="">All Audiences</option>
+                            <option value="all">All Users</option>
+                            <option value="students">Students Only</option>
+                            <option value="teachers">Teachers Only</option>
+                            <option value="specific">Specific Sections</option>
+                        </select>
+                        
+                        <select class="filter-select" id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="announcements-container">
+                <div class="announcements-list" id="announcementsList">
+                    <!-- Announcements will be loaded here -->
+                    <div class="announcement-loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading announcements...
+                    </div>
+                </div>
+                
+                <div class="pagination-controls">
+                    <button id="prevPageBtn" class="btn-icon" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span id="pageInfo">Page 1 of 1</span>
+                    <button id="nextPageBtn" class="btn-icon" disabled>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Announcement Modal -->
+    <div id="announcementModal" class="modal">
+        <div class="modal-content large-modal">
+            <button class="close-modal" id="cancelAnnouncementBtn">&times;</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">Create New Announcement</h2>
+                <p>Fill in the details for your announcement</p>
+            </div>
+            
+            <form id="announcementForm">
+                <div class="form-group">
+                    <label for="announcementTitle">Title*</label>
+                    <input type="text" id="announcementTitle" placeholder="Enter announcement title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="announcementContent">Content*</label>
+                    <textarea id="announcementContent" rows="5" placeholder="Enter announcement content" required></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="announcementAudience">Audience*</label>
+                        <select id="announcementAudience" required>
+                            <option value="all">All Users</option>
+                            <option value="students">All Students</option>
+                            <option value="specific">Specific Sections</option>
+                        </select>
+                    </div>
+                    
+                    <div id="specificSectionsContainer" class="form-group" style="display: none;">
+                        <label>Select Sections</label>
+                        <div class="section-checkboxes" id="sectionOptions">
+                            <!-- Sections will be loaded here -->
+                            <p class="loading-sections"><i class="fas fa-spinner fa-spin"></i> Loading sections...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startDate">Start Date*</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="endDate">End Date (optional)</label>
+                        <input type="date" id="endDate">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="announcementStatus">Status*</label>
+                    <select id="announcementStatus" required>
+                        <option value="published">Published</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" id="cancelAnnouncementBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Announcement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password Modal (same as in classes.html) -->
+    <div id="changePasswordModal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Change Password</h2>
+                <p>Secure your account with a new password</p>
+            </div>
+            <form id="changePasswordForm">
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="currentPassword" placeholder="Current Password" required>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-key input-icon"></i>
+                    <input type="password" id="newPassword" placeholder="New Password" required>
+                </div>
+                <div class="password-strength">
+                    <span>Strength:</span>
+                    <div class="strength-meter">
+                        <div class="strength-meter-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-check-circle input-icon"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" required>
+                </div>
+                
+                <button type="submit">
+                    <i class="fas fa-sync-alt" style="margin-right: 8px;"></i>
+                    Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/announcements.js"></script>
+    <script src="../overdue-checker.js"></script>
+</body>
+</html>

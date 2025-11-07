@@ -1,0 +1,722 @@
+/* Student Management Specific Styles */
+
+/* Table Container */
+.students-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+/* Search Box */
+.search-box {
+    display: flex;
+    margin-left: 15px;
+}
+
+.search-box input {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+    width: 250px;
+    transition: all 0.3s;
+}
+
+.search-box input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.search-box button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    padding: 0 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-box button:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-active {
+    background-color: #e3f7ed;
+    color: #1f9d55;
+}
+
+.status-inactive {
+    background-color: #ffe8e8;
+    color: #e3342f;
+}
+
+.status-transferred {
+    background-color: #e3f1ff;
+    color: #3490dc;
+}
+
+.status-graduated {
+    background-color: #f3e8ff;
+    color: #9561e2;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn.edit {
+    color: var(--primary-color);
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.action-btn.delete {
+    color: var(--accent-color);
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Modal Overlay */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalFadeIn 0.3s ease-out;
+    position: relative;
+    border: 1px solid #e0e0e0;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal Header */
+.modal-content h2 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin: 0;
+    padding: 20px 25px;
+    border-bottom: 1px solid #f0f0f0;
+    background-color: #f9f9f9;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+}
+
+.modal-content h2::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 24px;
+    background-color: #3498db;
+    margin-right: 12px;
+    border-radius: 3px;
+}
+
+/* Close Button */
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 1.5rem;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: none;
+    border: none;
+    padding: 5px;
+}
+
+.close-modal:hover {
+    color: #e74c3c;
+    transform: scale(1.1);
+}
+
+/* Form Styles */
+#studentForm {
+    padding: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #34495e;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    background-color: #f9f9f9;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    background-color: white;
+}
+
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 15px;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.btn-secondary {
+    background-color: #ecf0f1;
+    color: #7f8c8d;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #d6dbdf;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(52, 152, 219, 0.2);
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-secondary,
+    .btn-primary {
+        width: 100%;
+    }
+}
+
+/* Confirmation Modal */
+.confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal.small .modal-content {
+    max-width: 400px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .search-box {
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+    }
+    
+    .search-box input {
+        width: 100%;
+    }
+    
+    .section-actions {
+        flex-direction: column;
+    }
+    
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+}
+
+/* Section Header Styles */
+.section-header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.section-header h2 {
+    color: var(--dark-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.section-header h2::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 24px;
+    background-color: var(--primary-color);
+    margin-right: 12px;
+    border-radius: 4px;
+}
+
+.section-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Add New Student Button */
+#addNewStudentBtn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(52, 152, 219, 0.2);
+}
+
+#addNewStudentBtn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+#addNewStudentBtn i {
+    font-size: 0.9rem;
+}
+
+/* Search Box */
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.search-box:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.search-box input {
+    padding: 10px 15px;
+    border: none;
+    width: 250px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.search-box button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 15px 15px;
+    position: relative;
+    display: flex;
+    height: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-box button:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .section-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+    
+    .search-box input {
+        width: 100%;
+    }
+    
+    #addNewStudentBtn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Action Buttons */
+.btn-action {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 8px;
+    margin: 0 3px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit {
+    color: #3498db;
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.btn-view {
+    color: #2ecc71;
+    background-color: rgba(46, 204, 113, 0.1);
+}
+
+.btn-delete {
+    color: #e74c3c;
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+.btn-action:hover {
+    transform: scale(1.1);
+}
+
+.btn-edit:hover {
+    background-color: rgba(52, 152, 219, 0.2);
+}
+
+.btn-view:hover {
+    background-color: rgba(46, 204, 113, 0.2);
+}
+
+.btn-delete:hover {
+    background-color: rgba(231, 76, 60, 0.2);
+}
+
+.btn-reset {
+    color: #f39c12;
+    background-color: rgba(243, 156, 18, 0.1);
+}
+
+.btn-reset:hover {
+    background-color: rgba(243, 156, 18, 0.2);
+    transform: scale(1.1);
+}
+
+/* View Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #7f8c8d;
+}
+
+.student-details {
+    margin-top: 20px;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.detail-label {
+    font-weight: bold;
+    width: 120px;
+    color: #7f8c8d;
+}
+
+.detail-value {
+    flex: 1;
+}
+
+/* Pagination Styles */
+.pagination-container {
+    display: flex;
+    position: relative;
+    left: 50%;
+    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    padding: 15px 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.pagination {
+    display: flex;
+    gap: 5px;
+}
+
+.pagination-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background-color: #f5f5f5;
+    color: #333;
+    display: inline;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+}
+
+.pagination-btn.active {
+    background-color: #4285f4;
+    color: white;
+    font-weight: bold;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: #666;
+}
+
+.pagination-info {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Font Awesome icons */
+.pagination-btn i {
+    font-size: 12px;
+}
+
+/* Bulk Actions Styles */
+.bulk-actions {
+    position: relative;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.bulk-actions-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #fff;
+    min-width: 220px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    z-index: 1000;
+    padding: 5px 0;
+    border: 1px solid #ddd;
+}
+
+.bulk-actions:hover .bulk-actions-dropdown {
+    display: block;
+}
+
+.dropdown-header {
+    padding: 8px 16px;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #eee;
+}
+
+.dropdown-item {
+    width: 100%;
+    padding: 8px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-item i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 5px 0;
+}
+
+/* Checkbox column in table */
+.data-table th:first-child,
+.data-table td:first-child {
+    width: 40px;
+    text-align: center;
+}
+
+.data-table th:first-child {
+    width: 40px;
+}
+
+.checkbox-cell {
+    text-align: center;
+}
+
+.student-checkbox {
+    cursor: pointer;
+}
+
+.btn-secondary.has-selection {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.btn-secondary.has-selection:hover {
+    background-color: #3e8e41;
+    border-color: #3e8e41;
+}

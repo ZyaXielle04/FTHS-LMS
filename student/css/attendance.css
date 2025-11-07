@@ -1,0 +1,215 @@
+/* Attendance Module Container */
+.attendance-module {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #333;
+    box-sizing: border-box;
+}
+
+.attendance-module-title {
+    color: #2c3e50;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #ecf0f1;
+    text-align: center;
+}
+
+/* Main Content Area */
+.attendance-module-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Stats Grid */
+.attendance-module-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.attendance-stat-card {
+    padding: 1.5rem 1rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    color: white;
+}
+
+.rate {
+    background-color: #f800ae;
+}
+
+.total-present {
+    background-color: #2ecc71;
+}
+
+.total-absent {
+    background-color: #e74c3c;
+}
+
+.total-late {
+    background-color: #f39c12;
+}
+
+.total-excused {
+    background-color: #95a5a6;
+}
+
+.attendance-stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.attendance-stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.attendance-stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Records Section */
+.attendance-module-records {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.attendance-records-title {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.attendance-table-wrapper {
+    overflow-x: auto;
+}
+
+.attendance-records-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.attendance-records-table th, 
+.attendance-records-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.attendance-records-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.attendance-records-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.attendance-no-records {
+    text-align: center;
+    color: #7f8c8d;
+    padding: 2rem;
+}
+
+/* Status Badges */
+.attendance-status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.attendance-status-badge.present {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.attendance-status-badge.absent {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.attendance-status-badge.late {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.attendance-status-badge.excused {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+/* Error Message */
+.attendance-error-message {
+    color: #dc3545;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .attendance-module {
+        padding: 15px;
+    }
+    
+    .attendance-module-title {
+        font-size: 1.5rem;
+    }
+    
+    .attendance-stat-card {
+        padding: 1rem 0.5rem;
+    }
+    
+    .attendance-stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .attendance-module-records {
+        padding: 1rem;
+    }
+    
+    .attendance-records-table th, 
+    .attendance-records-table td {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .attendance-module-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .attendance-module-title {
+        font-size: 1.3rem;
+    }
+    
+    .attendance-stat-value {
+        font-size: 1.3rem;
+    }
+    
+    .attendance-stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .attendance-records-title {
+        font-size: 1.1rem;
+    }
+}

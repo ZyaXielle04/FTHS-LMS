@@ -1,0 +1,193 @@
+/* Resources Section Styles */
+.resources-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.resources-title {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 0.5rem;
+}
+
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.resource-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e0e0e0;
+}
+
+.resource-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.resource-icon {
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    font-size: 2.5rem;
+    color: #4a5568;
+}
+
+.resource-info {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+.resource-name {
+    margin: 0 0 10px;
+    color: #2d3748;
+    font-size: 1.1rem;
+}
+
+.resource-description {
+    margin: 0 0 15px;
+    color: #4a5568;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.resource-meta {
+    display: flex;
+    justify-content: space-between;
+    color: #718096;
+    font-size: 0.8rem;
+    margin-top: auto;
+}
+
+.resource-actions {
+    padding: 0 15px 15px;
+}
+
+.download-btn {
+    display: inline-block;
+    background-color: #4299e1;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.download-btn:hover {
+    background-color: #3182ce;
+}
+
+.download-btn i {
+    margin-right: 5px;
+}
+
+.no-resources-message {
+    color: #718096;
+    text-align: center;
+    padding: 30px;
+    font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .resources-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .resources-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .resource-card {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .resource-icon {
+        padding: 15px;
+        font-size: 1.8rem;
+        flex: 0 0 auto;
+    }
+    
+    .resource-info {
+        padding: 10px;
+    }
+    
+    .resource-actions {
+        padding: 0 10px 0 0;
+    }
+}
+
+/* Resource Type Badges */
+.resource-type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: 8px;
+}
+
+.resource-type-badge.pdf {
+    background-color: #FFEBEE;
+    color: #C62828;
+}
+
+.resource-type-badge.word {
+    background-color: #E3F2FD;
+    color: #1565C0;
+}
+
+.resource-type-badge.powerpoint {
+    background-color: #FFF3E0;
+    color: #EF6C00;
+}
+
+.resource-type-badge.excel {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+}
+
+.resource-type-badge.image {
+    background-color: #F3E5F5;
+    color: #7B1FA2;
+}
+
+.resource-type-badge.video {
+    background-color: #E1F5FE;
+    color: #0277BD;
+}
+
+.resource-type-badge.audio {
+    background-color: #E0F7FA;
+    color: #00838F;
+}
+
+.resource-type-badge.archive {
+    background-color: #ECEFF1;
+    color: #37474F;
+}
+
+.resource-type-badge.text {
+    background-color: #EEEEEE;
+    color: #424242;
+}
+
+.resource-type-badge.file {
+    background-color: #F5F5F5;
+    color: #616161;
+}
