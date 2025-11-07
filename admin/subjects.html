@@ -48,12 +48,9 @@
                     <li>
                         <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
                     </li>
-<<<<<<< HEAD
                     <li>
-                        <a ><i class="fas fa-user-plus"></i>My Profile</a>
+                        <a href="#" id="profileBtn"><i class="fas fa-user-plus"></i>My Profile</a>
                     </li>
-=======
->>>>>>> e59c131423f19c535cb3822d6b2c9d29890da42b
                 </ul>
             </nav>
             <div class="sidebar-footer">
@@ -184,6 +181,53 @@
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="profile-modal-content">
+            <button class="close-profile-modal">&times;</button>
+            <h2>My Profile</h2>
+            <p>Here are your account details:</p>
+
+            <div class="profile-field">
+                <label>Full Name</label>
+                <input type="text" id="profileFullName" readonly>
+            </div>
+
+            <div class="profile-field">
+                <label>Email</label>
+                <input type="text" id="profileEmail" readonly>
+            </div>
+
+            <div class="profile-field">
+                <label>Role</label>
+                <input type="text" id="profileRole" readonly>
+            </div>
+
+            <hr style="margin:20px 0;">
+
+            <h3>Change Password</h3>
+
+            <div class="profile-field">
+                <label>Current Password</label>
+                <input type="password" id="currentPassword" placeholder="Enter current password">
+            </div>
+
+            <div class="profile-field">
+                <label>New Password</label>
+                <input type="password" id="newPassword" placeholder="Enter new password">
+            </div>
+
+            <div class="profile-field">
+                <label>Confirm New Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm new password">
+            </div>
+
+            <button type="button" id="updatePasswordBtn">
+                <i class="fas fa-sync-alt" style="margin-right:8px"></i> Update Password
+            </button>
         </div>
     </div>
 
