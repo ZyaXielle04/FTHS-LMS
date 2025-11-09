@@ -53,23 +53,20 @@ async function loadResourcesContent(classId) {
             const statusClass = resource.type.toLowerCase(); // For status badge styling
             
             html += `
-                <div class="resource-card" data-resource-id="${resource.id}">
-                    <div class="resource-icon">
-                        <i class="${iconClass}"></i>
-                    </div>
-                    <div class="resource-info">
-                        <h3 class="resource-name">${resource.name}</h3>
-                        <p class="resource-description">${resource.description}</p>
-                        <div class="resource-meta">
-                            <span class="resource-date">${uploadDate}</span>
-                            <span class="resource-size">${formatFileSize(resource.size)}</span>
-                            <span class="resource-type-badge ${statusClass}">${resource.type}</span>
-                        </div>
-                    </div>
-                    <div class="resource-actions">
+                <div class="resource-row" data-resource-id="${resource.id}">
+                    <div class="resource-main">
+                        <div class="resource-title">${resource.name}</div>
+                        <span class="resource-type-badge ${statusClass}">${resource.type}</span>
+                        <span class="resource-size">${formatFileSize(resource.size)}</span>
                         <a href="${resource.downloadURL}" class="download-btn" download="${resource.fileName}">
-                            <i class="fas fa-download"></i> Download
+                            <i class="fas fa-download"></i>
                         </a>
+                        <button class="toggle-details-btn">Show More</button>
+                    </div>
+
+                    <div class="resource-details">
+                        <p class="resource-description">${resource.description || "No description provided."}</p>
+                        <p class="resource-date">Uploaded: ${uploadDate}</p>
                     </div>
                 </div>
             `;
@@ -173,6 +170,17 @@ function setupResourcesInteractions() {
         }
     });
 }
+
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('toggle-details-btn')) {
+        const card = e.target.closest('.resource-row');
+        const details = card.querySelector('.resource-details');
+
+        details.classList.toggle('show');
+        e.target.textContent = details.classList.contains('show') ? 'Show Less' : 'Show More';
+    }
+});
+
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {

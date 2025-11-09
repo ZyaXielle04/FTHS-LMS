@@ -13,74 +13,60 @@
     padding-bottom: 0.5rem;
 }
 
+/* Single-column list layout */
 .resources-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-.resource-card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: column;
-    border: 1px solid #e0e0e0;
+    gap: 12px;
 }
 
-.resource-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+/* Each resource row */
+.resource-row {
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #dcdcdc;
+    padding: 12px 16px;
+    transition: box-shadow 0.2s ease;
 }
 
-.resource-icon {
-    background-color: #f8f9fa;
-    padding: 20px;
-    text-align: center;
-    font-size: 2.5rem;
-    color: #4a5568;
+.resource-row:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
-.resource-info {
-    padding: 15px;
-    flex-grow: 1;
+/* Top visible row */
+.resource-main {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto auto;
+    align-items: center;
+    gap: 12px;
 }
 
-.resource-name {
-    margin: 0 0 10px;
+/* Title */
+.resource-title {
+    font-weight: 600;
     color: #2d3748;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-.resource-description {
-    margin: 0 0 15px;
-    color: #4a5568;
-    font-size: 0.9rem;
-    line-height: 1.5;
+/* File size */
+.resource-size {
+    font-size: 0.85rem;
+    color: #555;
 }
 
-.resource-meta {
-    display: flex;
-    justify-content: space-between;
-    color: #718096;
-    font-size: 0.8rem;
-    margin-top: auto;
-}
-
-.resource-actions {
-    padding: 0 15px 15px;
-}
-
+/* Download button */
 .download-btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     background-color: #4299e1;
     color: white;
-    padding: 8px 15px;
+    padding: 6px 10px;
     border-radius: 4px;
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     transition: background-color 0.2s;
 }
 
@@ -92,6 +78,70 @@
     margin-right: 5px;
 }
 
+/* Show More button */
+.toggle-details-btn {
+    background: none;
+    border: none;
+    color: #3182ce;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Hidden content section */
+.resource-details {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 1px solid transparent;
+    transition: max-height 0.35s ease, opacity 0.35s ease, padding-top 0.35s ease, margin-top 0.35s ease;
+}
+
+/* When expanded */
+.resource-details.show {
+    max-height: 300px; /* enough room for description+date */
+    opacity: 1;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.resource-description {
+    color: #4a5568;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.resource-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* Badge for file type */
+.resource-type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Colors for types */
+.resource-type-badge.pdf { background: #FFEBEE; color: #C62828; }
+.resource-type-badge.word { background: #E3F2FD; color: #1565C0; }
+.resource-type-badge.powerpoint { background: #FFF3E0; color: #EF6C00; }
+.resource-type-badge.excel { background: #E8F5E9; color: #2E7D32; }
+.resource-type-badge.image { background: #F3E5F5; color: #7B1FA2; }
+.resource-type-badge.video { background: #E1F5FE; color: #0277BD; }
+.resource-type-badge.audio { background: #E0F7FA; color: #00838F; }
+.resource-type-badge.archive { background: #ECEFF1; color: #37474F; }
+.resource-type-badge.text { background: #EEEEEE; color: #424242; }
+.resource-type-badge.file { background: #F5F5F5; color: #616161; }
+
+/* No resources message */
 .no-resources-message {
     color: #718096;
     text-align: center;
@@ -99,95 +149,14 @@
     font-style: italic;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .resources-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+/* Responsive */
+@media (max-width: 700px) {
+    .resource-main {
+        grid-template-columns: 1fr auto auto;
     }
-}
 
-@media (max-width: 480px) {
-    .resources-grid {
-        grid-template-columns: 1fr;
+    .resource-size, 
+    .resource-type-badge {
+        display: none;
     }
-    
-    .resource-card {
-        flex-direction: row;
-        align-items: center;
-    }
-    
-    .resource-icon {
-        padding: 15px;
-        font-size: 1.8rem;
-        flex: 0 0 auto;
-    }
-    
-    .resource-info {
-        padding: 10px;
-    }
-    
-    .resource-actions {
-        padding: 0 10px 0 0;
-    }
-}
-
-/* Resource Type Badges */
-.resource-type-badge {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin-left: 8px;
-}
-
-.resource-type-badge.pdf {
-    background-color: #FFEBEE;
-    color: #C62828;
-}
-
-.resource-type-badge.word {
-    background-color: #E3F2FD;
-    color: #1565C0;
-}
-
-.resource-type-badge.powerpoint {
-    background-color: #FFF3E0;
-    color: #EF6C00;
-}
-
-.resource-type-badge.excel {
-    background-color: #E8F5E9;
-    color: #2E7D32;
-}
-
-.resource-type-badge.image {
-    background-color: #F3E5F5;
-    color: #7B1FA2;
-}
-
-.resource-type-badge.video {
-    background-color: #E1F5FE;
-    color: #0277BD;
-}
-
-.resource-type-badge.audio {
-    background-color: #E0F7FA;
-    color: #00838F;
-}
-
-.resource-type-badge.archive {
-    background-color: #ECEFF1;
-    color: #37474F;
-}
-
-.resource-type-badge.text {
-    background-color: #EEEEEE;
-    color: #424242;
-}
-
-.resource-type-badge.file {
-    background-color: #F5F5F5;
-    color: #616161;
 }
