@@ -473,7 +473,7 @@ body {
 @media screen and (max-width: 500px) {
     #profileModal .profile-modal-content {
         width: 95% !important;
-        padding: 20px !important;
+        padding: 20px !important;   
     }
     #profileModal .close-profile-modal {
         font-size: 22px !important;
