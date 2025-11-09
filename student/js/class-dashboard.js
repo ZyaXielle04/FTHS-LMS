@@ -150,6 +150,8 @@ async function loadSectionContent(section, classId) {
 
     try {
         let content = '';
+        const authUser = JSON.parse(sessionStorage.getItem('authUser') || localStorage.getItem('authUser'));
+
         switch (section) {
             case 'overview':
                 content = await loadOverviewContent(classId);
@@ -161,7 +163,8 @@ async function loadSectionContent(section, classId) {
                 content = await loadAttendanceContent(classId);
                 break;
             case 'resources':
-                content = await loadResourcesContent(classId);
+                if (!authUser?.id) throw new Error("No authenticated user found.");
+                content = await loadResourcesContent(classId, authUser.id);
                 break;
             case 'announcements':
                 content = await loadAnnouncementsContent(classId);
@@ -171,20 +174,16 @@ async function loadSectionContent(section, classId) {
         }
 
         sectionElement.innerHTML = content;
-        
+
         // Initialize section-specific functionality
         if (section === 'overview') {
             initializeAttendanceChart();
             setupAssignmentLinks(classId);
         }
         else if (section === 'assignments') {
-            const authUser = JSON.parse(sessionStorage.getItem('authUser') || localStorage.getItem('authUser'));
-            if (authUser?.id) {
-                setupAssignments(classId, authUser.id);
-            }
-        } else if (section === 'resources') {
-            setupResourcesInteractions();
+            if (authUser?.id) setupAssignments(classId, authUser.id);
         }
+        // resources section no longer needs setupResourcesInteractions()
     } catch (error) {
         console.error(`Error loading ${section}:`, error);
         sectionElement.innerHTML = `

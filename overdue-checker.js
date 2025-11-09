@@ -1,18 +1,14 @@
-// realtime-overdue-checker.js
+// overdue-checker.js
 console.log('[RealtimeOverdueChecker] Initializing...');
 
-// Initialize Firebase
-if (!firebase.apps.length) {
-    console.log('[RealtimeOverdueChecker] Initializing Firebase...');
-    firebase.initializeApp({
-        databaseURL: "https://fths-lms-9820b-default-rtdb.asia-southeast1.firebasedatabase.app"
-    });
-}
-
 let isProcessing = false;
+let db;
 
 function setupRealtimeListeners() {
     console.log('[RealtimeOverdueChecker] Setting up realtime listeners...');
+    
+    // Initialize Firebase database reference
+    db = firebase.database();
     
     // Listen for changes to all assignments
     db.ref('classes').on('value', async (classesSnapshot) => {
@@ -65,16 +61,22 @@ function setupRealtimeListeners() {
     });
 }
 
-// Start the real-time listener
-setupRealtimeListeners();
-
-// Also check immediately on page load
-db.ref('classes').once('value').then(() => {
-    console.log('[RealtimeOverdueChecker] Initial load complete, ready for realtime updates');
+// Start the real-time listener when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    setupRealtimeListeners();
+    
+    // Also check immediately on page load
+    if (db) {
+        db.ref('classes').once('value').then(() => {
+            console.log('[RealtimeOverdueChecker] Initial load complete, ready for realtime updates');
+        });
+    }
 });
 
 // Clean up listener when page unloads
 window.addEventListener('beforeunload', () => {
-    db.ref('classes').off();
-    console.log('[RealtimeOverdueChecker] Cleaned up listeners');
+    if (db) {
+        db.ref('classes').off();
+        console.log('[RealtimeOverdueChecker] Cleaned up listeners');
+    }
 });

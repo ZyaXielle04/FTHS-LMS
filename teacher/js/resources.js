@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td><span class="resource-type-badge ${resource.type}">${resource.type}</span></td>
                 <td>${resource.className || 'N/A'}</td>
                 <td>${formattedDate}</td>
-                <td>${fileSize}</td>
+                <td>${fileSize}mb</td>
                 <td>
                     <div class="resource-actions">
                         <button class="view-btn" data-id="${resource.id}">

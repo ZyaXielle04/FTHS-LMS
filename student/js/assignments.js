@@ -46,7 +46,8 @@ function setupAssignments(classId, studentId) {
         studentAnswers: {}
     };
 
-    const assignmentsRef = firebase.database().ref(`classes/${classId}/assignments`);
+    const db = firebase.database();
+    const assignmentsRef = db.ref(`classes/${classId}/assignments`);
 
     listeners.assignments = assignmentsRef.on('value', async (snapshot) => {
         if (!snapshot.exists()) {
@@ -59,7 +60,7 @@ function setupAssignments(classId, studentId) {
             const assignmentId = assignmentSnapshot.key;
             const assignmentData = assignmentSnapshot.val();
             
-            const studentAnswerRef = firebase.database().ref(
+            const studentAnswerRef = db.ref(
                 `classes/${classId}/assignments/${assignmentId}/studentAnswers/${studentId}`
             );
 
@@ -97,7 +98,7 @@ function setupAssignments(classId, studentId) {
             assignmentsRef.off('value', listeners.assignments);
         }
         Object.keys(listeners.studentAnswers).forEach(assignmentId => {
-            firebase.database().ref(
+            db.ref(
                 `classes/${classId}/assignments/${assignmentId}/studentAnswers/${studentId}`
             ).off('value', listeners.studentAnswers[assignmentId]);
         });
@@ -125,7 +126,8 @@ function setupAssignmentButtonHandlers(classId, studentId) {
 }
 
 async function openAssignmentSubmissionModal(classId, assignmentId, studentId) {
-    const assignmentRef = firebase.database().ref(`classes/${classId}/assignments/${assignmentId}`);
+    const db = firebase.database();
+    const assignmentRef = db.ref(`classes/${classId}/assignments/${assignmentId}`);
     const assignmentSnapshot = await assignmentRef.once('value');
     const assignment = assignmentSnapshot.val();
     
@@ -139,6 +141,9 @@ async function openAssignmentSubmissionModal(classId, assignmentId, studentId) {
                 <h3>Submission Closed</h3>
                 <p>This assignment is overdue and can no longer be submitted.</p>
                 <p>Due date: ${dueDate.toLocaleString()}</p>
+                <div class="modal-actions">
+                    <button id="close-overdue" class="btn-secondary">Close</button>
+                </div>
             </div>
         `;
     } else {
@@ -151,11 +156,14 @@ async function openAssignmentSubmissionModal(classId, assignmentId, studentId) {
                         <label for="homework-answer">Your Answer:</label>
                         <textarea id="homework-answer" placeholder="Type your answer here..." rows="10"></textarea>
                     </div>
-                    <button id="submit-assignment" class="btn-primary">Submit</button>
+                    <div class="modal-actions">
+                        <button id="submit-assignment" class="btn-primary">Submit</button>
+                        <button id="cancel-assignment" class="btn-secondary">Cancel</button>
+                    </div>
                 </div>
             `;
         } else if (assignment.type === 'quiz' || assignment.type === 'exam') {
-            const questionsRef = firebase.database().ref(`classes/${classId}/assignments/${assignmentId}/questions`);
+            const questionsRef = db.ref(`classes/${classId}/assignments/${assignmentId}/questions`);
             const questionsSnapshot = await questionsRef.once('value');
             const questions = questionsSnapshot.val() || [];
             
@@ -166,7 +174,10 @@ async function openAssignmentSubmissionModal(classId, assignmentId, studentId) {
                     <form id="quiz-form">
                         ${questions.map((question, index) => renderQuestion(question, index)).join('')}
                     </form>
-                    <button id="submit-assignment" class="btn-primary">Submit</button>
+                    <div class="modal-actions">
+                        <button id="submit-assignment" class="btn-primary">Submit</button>
+                        <button id="cancel-assignment" class="btn-secondary">Cancel</button>
+                    </div>
                 </div>
             `;
         }
@@ -174,29 +185,49 @@ async function openAssignmentSubmissionModal(classId, assignmentId, studentId) {
     
     showModal(modalContent);
     
+    // Only add event listeners if the assignment is not overdue and buttons exist
     if (!isOverdue) {
-        document.getElementById('submit-assignment').addEventListener('click', async () => {
-            if (assignment.type === 'homework') {
-                const answer = document.getElementById('homework-answer').value.trim();
-                if (!answer) {
-                    showToast('Please enter your answer before submitting', 'error');
-                    return;
+        const submitBtn = document.getElementById('submit-assignment');
+        const cancelBtn = document.getElementById('cancel-assignment');
+        
+        if (submitBtn) {
+            submitBtn.addEventListener('click', async () => {
+                if (assignment.type === 'homework') {
+                    const answer = document.getElementById('homework-answer').value.trim();
+                    if (!answer) {
+                        showToast('Please enter your answer before submitting', 'error');
+                        return;
+                    }
+                    await submitHomeworkAnswer(classId, assignmentId, studentId, answer);
+                } else if (assignment.type === 'quiz' || assignment.type === 'exam') {
+                    const questionsRef = db.ref(`classes/${classId}/assignments/${assignmentId}/questions`);
+                    const questionsSnapshot = await questionsRef.once('value');
+                    const questions = questionsSnapshot.val() || [];
+                    const answers = collectQuizAnswers(questions);
+                    
+                    if (questions.some((q, i) => q.required && !answers[i])) {
+                        showToast('Please answer all required questions', 'error');
+                        return;
+                    }
+                    
+                    await submitQuizAnswers(classId, assignmentId, studentId, answers, questions);
                 }
-                await submitHomeworkAnswer(classId, assignmentId, studentId, answer);
-            } else if (assignment.type === 'quiz' || assignment.type === 'exam') {
-                const questionsRef = firebase.database().ref(`classes/${classId}/assignments/${assignmentId}/questions`);
-                const questionsSnapshot = await questionsRef.once('value');
-                const questions = questionsSnapshot.val() || [];
-                const answers = collectQuizAnswers(questions);
-                
-                if (questions.some((q, i) => q.required && !answers[i])) {
-                    showToast('Please answer all required questions', 'error');
-                    return;
-                }
-                
-                await submitQuizAnswers(classId, assignmentId, studentId, answers, questions);
-            }
-        });
+            });
+        }
+        
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                closeModal();
+            });
+        }
+    } else {
+        // For overdue assignments, add a close button listener if it exists
+        const closeBtn = document.getElementById('close-overdue');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                closeModal();
+            });
+        }
     }
 }
 
@@ -295,6 +326,7 @@ function collectQuizAnswers(questions) {
 }
 
 async function submitHomeworkAnswer(classId, assignmentId, studentId, answer) {
+    const db = firebase.database();
     const updates = {
         [`classes/${classId}/assignments/${assignmentId}/studentAnswers/${studentId}/answer`]: answer,
         [`classes/${classId}/assignments/${assignmentId}/studentAnswers/${studentId}/submittedAt`]: firebase.database.ServerValue.TIMESTAMP,
@@ -304,7 +336,7 @@ async function submitHomeworkAnswer(classId, assignmentId, studentId, answer) {
     };
     
     try {
-        await firebase.database().ref().update(updates);
+        await db.ref().update(updates);
         closeModal();
         showToast('Homework submitted successfully! It will be graded by your teacher.');
     } catch (error) {
@@ -314,6 +346,7 @@ async function submitHomeworkAnswer(classId, assignmentId, studentId, answer) {
 }
 
 async function submitQuizAnswers(classId, assignmentId, studentId, answers, questions) {
+    const db = firebase.database();
     let totalScore = 0;
     const gradedAnswers = {};
     
@@ -362,7 +395,7 @@ async function submitQuizAnswers(classId, assignmentId, studentId, answers, ques
     };
     
     try {
-        await firebase.database().ref().update(updates);
+        await db.ref().update(updates);
         closeModal();
         if (needsTeacherGrading) {
             showToast('Answers submitted! Some questions will be graded by your teacher.');
@@ -376,11 +409,12 @@ async function submitQuizAnswers(classId, assignmentId, studentId, answers, ques
 }
 
 async function openAssignmentDetailsModal(classId, assignmentId, studentId) {
-    const assignmentRef = firebase.database().ref(`classes/${classId}/assignments/${assignmentId}`);
+    const db = firebase.database();
+    const assignmentRef = db.ref(`classes/${classId}/assignments/${assignmentId}`);
     const assignmentSnapshot = await assignmentRef.once('value');
     const assignment = assignmentSnapshot.val();
     
-    const studentAnswersRef = firebase.database().ref(
+    const studentAnswersRef = db.ref(
         `classes/${classId}/assignments/${assignmentId}/studentAnswers/${studentId}`
     );
     const studentAnswersSnapshot = await studentAnswersRef.once('value');
@@ -399,8 +433,7 @@ async function openAssignmentDetailsModal(classId, assignmentId, studentId) {
     
     if (studentData) {
         const gradingStatus = studentData.needsTeacherGrading && studentData.grade === undefined ? 
-            '<span class="grading-badge pending"><i class="fas fa-clock"></i> Pending Grading</span>' : 
-            '';
+            '<span class="grading-badge pending"><i class="fas fa-clock"></i> Pending Grading</span>' : '';
             
         modalContent += `
             <div class="submission-details">
@@ -420,16 +453,16 @@ async function openAssignmentDetailsModal(classId, assignmentId, studentId) {
                     <div class="answer-content">${studentData.answer || 'No answer submitted'}</div>
                     ${studentData.needsTeacherGrading && studentData.grade === undefined ? 
                         '<div class="grading-status"><i class="fas fa-clock"></i> Waiting for teacher evaluation</div>' : ''}
-                    ${studentData.teacherFeedback ? `
+                    ${studentData.feedback ? `
                         <div class="teacher-feedback">
                             <h5>Teacher Feedback:</h5>
-                            <div class="feedback-content">${studentData.teacherFeedback}</div>
+                            <div class="feedback-content">${studentData.feedback}</div>
                         </div>
                     ` : ''}
                 </div>
             `;
         } else if ((assignment.type === 'quiz' || assignment.type === 'exam') && studentData.answers) {
-            const questionsRef = firebase.database().ref(`classes/${classId}/assignments/${assignmentId}/questions`);
+            const questionsRef = db.ref(`classes/${classId}/assignments/${assignmentId}/questions`);
             const questionsSnapshot = await questionsRef.once('value');
             const questions = questionsSnapshot.val() || [];
             
@@ -565,7 +598,8 @@ function setupStudentAnswerListeners(classId, studentId, assignments) {
 
     assignments.forEach((assignment) => {
         const assignmentId = assignment.id;
-        const studentAnswerRef = firebase.database().ref(
+        const db = firebase.database();
+        const studentAnswerRef = db.ref(
             `classes/${classId}/assignments/${assignmentId}/studentAnswers/${studentId}`
         );
 
@@ -629,7 +663,9 @@ function generateAssignmentsHTML(assignments) {
         return '<div class="no-assignments">No assignments found for this class</div>';
     }
 
-    return assignments.map(assignment => {
+    return assignments
+    .filter(assignment => assignment.type === 'quiz' || assignment.type === 'exam')
+    .map(assignment => {
         const dueDate = assignment.dueDate ? new Date(assignment.dueDate) : null;
         const formattedDueDate = dueDate ? dueDate.toLocaleDateString() + ' ' + dueDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'No due date';
         

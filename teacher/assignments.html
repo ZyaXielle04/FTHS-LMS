@@ -125,6 +125,15 @@
                     <label for="assignmentDescription">Description:</label>
                     <textarea id="assignmentDescription" rows="4"></textarea>
                 </div>
+
+                <div class="form-group" id="resourceLinkField">
+                    <label for="linkedResource">Link to Resource (Optional):</label>
+                    <select id="linkedResource" class="form-control">
+                        <option value="">-- No resource linked --</option>
+                        <!-- Resources will be populated here -->
+                    </select>
+                    <small class="form-text">Link this assignment to a learning resource for context</small>
+                </div>
                 
                 <!-- Quiz/Exam Specific Fields -->
                 <div id="quizFields" class="assignment-type-fields" style="display:none;">

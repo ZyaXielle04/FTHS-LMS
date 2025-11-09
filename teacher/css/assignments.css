@@ -1067,3 +1067,68 @@ button:active {
     border: 1px solid #ddd;
     border-radius: 4px;
 }
+
+/* Linked Resource Styles */
+.linked-resource {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #007bff;
+}
+
+.linked-resource i {
+    color: #007bff;
+}
+
+.linked-resource span {
+    font-size: 0.9em;
+    color: #495057;
+}
+
+/* Resource Link in View Modal */
+.resource-link-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-top: 8px;
+}
+
+.resource-link-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.resource-link-info i {
+    color: #007bff;
+    font-size: 1.2em;
+}
+
+.resource-type {
+    display: block;
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-top: 2px;
+}
+
+.btn-view-resource {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+.btn-view-resource:hover {
+    background: #0056b3;
+}

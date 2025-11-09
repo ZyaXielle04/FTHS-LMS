@@ -134,13 +134,24 @@ async function createAssignmentWithStudentAnswers(assignmentData) {
             };
         });
 
-        // 4. Prepare the complete assignment data
+        // 4. Prepare the complete assignment data with proper linkedResource handling
         const completeAssignmentData = {
             ...assignmentData,
             studentAnswers,
             assignmentId,
             createdAt: firebase.database.ServerValue.TIMESTAMP
         };
+
+        // Ensure linkedResource properties are properly set (not undefined)
+        if (completeAssignmentData.linkedResource) {
+            completeAssignmentData.linkedResource = {
+                id: completeAssignmentData.linkedResource.id || null,
+                title: completeAssignmentData.linkedResource.title || null,
+                type: completeAssignmentData.linkedResource.type || null,
+                downloadUrl: completeAssignmentData.linkedResource.downloadUrl || null,
+                filePath: completeAssignmentData.linkedResource.filePath || null
+            };
+        }
 
         // 5. Save to both paths (class-specific and global)
         await Promise.all([
@@ -187,12 +198,33 @@ async function saveExistingAssignment(assignmentData) {
     const assignmentRef = db.ref(`classes/${classKey}/assignments/${editingAssignmentId}`);
     
     const existingAssignment = await assignmentRef.once('value');
-    if (existingAssignment.val()?.studentAnswers) {
-        assignmentData.studentAnswers = existingAssignment.val().studentAnswers;
+    const existingData = existingAssignment.val();
+    
+    if (existingData?.studentAnswers) {
+        assignmentData.studentAnswers = existingData.studentAnswers;
     }
     
-    await assignmentRef.update(assignmentData);
-    await db.ref(`assignments/${editingAssignmentId}`).update(assignmentData);
+    // Preserve the complete linkedResource object if it exists and we're not changing it
+    if (existingData?.linkedResource && !assignmentData.linkedResource) {
+        assignmentData.linkedResource = existingData.linkedResource;
+    }
+    
+    // Ensure linkedResource has all required properties if it exists
+    if (assignmentData.linkedResource) {
+        assignmentData.linkedResource = {
+            id: assignmentData.linkedResource.id || existingData?.linkedResource?.id || null,
+            title: assignmentData.linkedResource.title || existingData?.linkedResource?.title || null,
+            type: assignmentData.linkedResource.type || existingData?.linkedResource?.type || null,
+            downloadUrl: assignmentData.linkedResource.downloadUrl || existingData?.linkedResource?.downloadUrl || null,
+            filePath: assignmentData.linkedResource.filePath || existingData?.linkedResource?.filePath || null
+        };
+    }
+    
+    // Clean the object to remove any undefined values before saving to Firebase
+    const cleanedData = cleanObjectForFirebase(assignmentData);
+    
+    await assignmentRef.update(cleanedData);
+    await db.ref(`assignments/${editingAssignmentId}`).update(cleanedData);
     
     Swal.fire('Success', 'Assignment updated successfully', 'success');
     closeAllModals();
@@ -280,6 +312,14 @@ function createAssignmentCard(id, assignment) {
     card.className = 'assignment-card';
     card.dataset.id = id;
 
+    // Check if there's a linked resource
+    const linkedResourceHTML = assignment.linkedResourceId ? `
+        <div class="linked-resource">
+            <i class="fas fa-link"></i>
+            <span>Linked to: ${assignment.linkedResource?.title || 'Resource'}</span>
+        </div>
+    ` : '';
+
     card.innerHTML = `
         <div class="assignment-card-header">
             <h3 class="assignment-title">${assignment.title}</h3>
@@ -289,6 +329,7 @@ function createAssignmentCard(id, assignment) {
             <i class="fas fa-calendar-alt"></i>
             Due: ${formattedDate}
         </div>
+        ${linkedResourceHTML}
         <div class="assignment-description">${assignment.description || 'No description provided'}</div>
         <div class="assignment-meta">
             <div class="assignment-points">${assignment.points} Points</div>
@@ -637,6 +678,7 @@ function getTypeBadge(type) {
     return types[type] || '';
 }
 
+// Modify the openAssignmentModal function to include resource loading
 function openAssignmentModal(type) {
     try {
         currentAssignmentType = type;
@@ -668,6 +710,7 @@ function openAssignmentModal(type) {
         // Show/hide appropriate fields
         const quizFields = document.getElementById('quizFields');
         const pointsField = document.getElementById('pointsField');
+        const resourceLinkField = document.getElementById('resourceLinkField');
         
         if (quizFields) {
             quizFields.style.display = (type === 'quiz' || type === 'exam') ? 'block' : 'none';
@@ -676,6 +719,16 @@ function openAssignmentModal(type) {
         if (pointsField) {
             pointsField.style.display = 'block';
             document.getElementById('assignmentPoints').disabled = (type === 'quiz' || type === 'exam');
+        }
+
+        // Show resource linking for homework only (you can change this if needed)
+        if (resourceLinkField) {
+            resourceLinkField.style.display = (type === 'homework') ? 'block' : 'none';
+        }
+
+        // Load resources for the dropdown
+        if (type === 'homework') {
+            populateResourceDropdown();
         }
 
         updateTotalPoints();
@@ -692,6 +745,7 @@ function closeAllModals() {
     quizItemModal.style.display = 'none';
 }
 
+// Modify the handleAssignmentSubmit function to include linked resource
 async function handleAssignmentSubmit(e) {
     e.preventDefault();
 
@@ -699,6 +753,7 @@ async function handleAssignmentSubmit(e) {
         const title = document.getElementById('assignmentTitle').value;
         const dueDate = document.getElementById('assignmentDueDate').value;
         const description = document.getElementById('assignmentDescription').value;
+        const linkedResourceId = document.getElementById('linkedResource').value;
         const type = currentAssignmentType;
 
         if (!title || !dueDate) {
@@ -731,6 +786,27 @@ async function handleAssignmentSubmit(e) {
             teacher: currentTeacherId,
             classId: classKey
         };
+
+        // Add linked resource if selected
+        if (linkedResourceId) {
+            assignmentData.linkedResourceId = linkedResourceId;
+            
+            // Get resource details for display
+            const resource = await getResourceDetails(linkedResourceId);
+            if (resource) {
+                assignmentData.linkedResource = {
+                    id: linkedResourceId,
+                    title: resource.title,
+                    type: resource.type,
+                    downloadUrl: resource.downloadUrl || null, // Ensure this is never undefined
+                    filePath: resource.filePath || null // Ensure this is never undefined
+                };
+            }
+        } else {
+            // If no resource is selected, ensure we remove any existing linked resource
+            assignmentData.linkedResourceId = null;
+            assignmentData.linkedResource = null;
+        }
 
         if (type === 'quiz' || type === 'exam') {
             assignmentData.questions = quizItems;
@@ -771,6 +847,25 @@ function viewAssignment(id, assignment) {
             exam: 'badge-red'
         }[assignment.type] || 'badge-gray';
 
+        // Linked resource section
+        const linkedResourceHTML = assignment.linkedResourceId ? `
+            <div class="linked-resource-section">
+                <h3 class="section-title">Linked Resource</h3>
+                <div class="resource-link-card">
+                    <div class="resource-link-info">
+                        <i class="fas fa-link"></i>
+                        <div>
+                            <strong>${assignment.linkedResource?.title || 'Linked Resource'}</strong>
+                            <span class="resource-type">${assignment.linkedResource?.type || 'Resource'}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-view-resource" onclick="openLinkedResource('${assignment.linkedResourceId}')">
+                        <i class="fas fa-external-link-alt"></i> Open Resource
+                    </button>
+                </div>
+            </div>
+        ` : '';
+
         let detailsHTML = `
             <div class="assignment-view-container">
                 <div class="assignment-view-header">
@@ -808,6 +903,8 @@ function viewAssignment(id, assignment) {
                             ${assignment.description || '<p class="text-muted">No description provided</p>'}
                         </div>
                     </div>
+                    
+                    ${linkedResourceHTML}
         `;
 
         if (assignment.questions?.length > 0) {
@@ -829,58 +926,33 @@ function viewAssignment(id, assignment) {
         // Add custom CSS for the modal
         const customCSS = `
             <style>
-                .grading-container {
-                    max-height: 70vh;
-                    overflow-y: auto;
+                .linked-resource-section {
+                    margin: 20px 0;
+                    padding: 15px;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 8px;
+                    background: #f8f9fa;
                 }
-                .submission-item {
+                .resource-link-card {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    padding: 12px;
-                    margin-bottom: 8px;
-                    border-radius: 6px;
-                    background: #f8f9fa;
+                    margin-top: 10px;
                 }
-                .student-info {
+                .resource-link-info {
                     display: flex;
                     align-items: center;
                     gap: 10px;
                 }
-                .status-badge {
-                    padding: 3px 8px;
-                    border-radius: 12px;
-                    font-size: 12px;
-                    font-weight: bold;
-                    color: white;
+                .resource-link-info i {
+                    color: #007bff;
+                    font-size: 1.2em;
                 }
-                .status-badge.pending {
-                    background: #f39c12;
-                }
-                .status-badge.submitted {
-                    background: #3498db;
-                }
-                .status-badge.graded {
-                    background: #2ecc71;
-                }
-                .submission-date {
-                    font-size: 12px;
-                    color: #7f8c8d;
-                }
-                .grade-form {
-                    max-height: 60vh;
-                    overflow-y: auto;
-                }
-                .question-grade {
-                    margin-bottom: 15px;
-                    padding-bottom: 15px;
-                    border-bottom: 1px solid #eee;
-                }
-                .student-answer {
-                    margin-top: 5px;
-                    padding: 8px;
-                    background: #f5f5f5;
-                    border-radius: 4px;
+                .resource-type {
+                    display: block;
+                    font-size: 0.9em;
+                    color: #6c757d;
+                    margin-top: 2px;
                 }
             </style>
         `;
@@ -901,6 +973,16 @@ function viewAssignment(id, assignment) {
         console.error('Error viewing assignment:', error);
         Swal.fire('Error', 'Failed to view assignment details', 'error');
     }
+}
+
+// Add this function to open linked resources
+function openLinkedResource(resourceId) {
+    // Close the current modal
+    Swal.close();
+    
+    // Open the resources page or show resource preview
+    // You can modify this based on how you want to handle resource viewing
+    window.open(`resources.html?class=${classKey}&view=${resourceId}`, '_blank');
 }
 
 function generateQuestionHTML(question, number) {
@@ -932,6 +1014,7 @@ function formatQuestionType(type) {
     return types[type] || type;
 }
 
+// Modify the editAssignment function to handle linked resources
 function editAssignment(id, assignment) {
     try {
         editingAssignmentId = id;
@@ -960,8 +1043,14 @@ function editAssignment(id, assignment) {
 
         // Show/hide appropriate fields
         const quizFields = document.getElementById('quizFields');
+        const resourceLinkField = document.getElementById('resourceLinkField');
+        
         if (quizFields) {
             quizFields.style.display = (assignment.type === 'quiz' || assignment.type === 'exam') ? 'block' : 'none';
+        }
+
+        if (resourceLinkField) {
+            resourceLinkField.style.display = (assignment.type === 'homework') ? 'block' : 'none';
         }
 
         // Fill in the form fields
@@ -969,6 +1058,17 @@ function editAssignment(id, assignment) {
         document.getElementById('assignmentDueDate').value = formatDateForInput(assignment.dueDate);
         document.getElementById('assignmentPoints').value = assignment.points;
         document.getElementById('assignmentDescription').value = assignment.description || '';
+
+        // Load resources and set the linked resource if it exists
+        if (assignment.type === 'homework') {
+            populateResourceDropdown().then(() => {
+                if (assignment.linkedResourceId) {
+                    document.getElementById('linkedResource').value = assignment.linkedResourceId;
+                } else {
+                    document.getElementById('linkedResource').value = '';
+                }
+            });
+        }
 
         // Display quiz items if applicable
         if (assignment.questions) {
@@ -984,6 +1084,20 @@ function editAssignment(id, assignment) {
         console.error('Error editing assignment:', error);
         Swal.fire('Error', 'Failed to edit assignment', 'error');
     }
+}
+
+function cleanObjectForFirebase(obj) {
+    const cleaned = {};
+    for (const key in obj) {
+        if (obj[key] !== undefined) {
+            if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+                cleaned[key] = cleanObjectForFirebase(obj[key]);
+            } else {
+                cleaned[key] = obj[key];
+            }
+        }
+    }
+    return cleaned;
 }
 
 function formatDateForInput(timestamp) {
@@ -1427,3 +1541,47 @@ function updateTotalPoints() {
 window.addEventListener('beforeunload', () => {
     // Clean up any Firebase listeners if needed
 });
+
+// Add this function to load resources for the current class
+async function loadClassResources() {
+    try {
+        const resourcesRef = db.ref(`classes/${classKey}/resources`);
+        const snapshot = await resourcesRef.once('value');
+        const resources = snapshot.val() || {};
+        
+        return Object.entries(resources).map(([id, resource]) => ({
+            id,
+            ...resource
+        }));
+    } catch (error) {
+        console.error('Error loading resources:', error);
+        return [];
+    }
+}
+
+// Add this function to populate the resource dropdown
+async function populateResourceDropdown() {
+    const resourceSelect = document.getElementById('linkedResource');
+    resourceSelect.innerHTML = '<option value="">-- No resource linked --</option>';
+    
+    const resources = await loadClassResources();
+    
+    resources.forEach(resource => {
+        const option = document.createElement('option');
+        option.value = resource.id;
+        option.textContent = `${resource.title} (${resource.type})`;
+        resourceSelect.appendChild(option);
+    });
+}
+
+// Add this function to get resource details
+async function getResourceDetails(resourceId) {
+    try {
+        const resourceRef = db.ref(`classes/${classKey}/resources/${resourceId}`);
+        const snapshot = await resourceRef.once('value');
+        return snapshot.val();
+    } catch (error) {
+        console.error('Error getting resource details:', error);
+        return null;
+    }
+}
