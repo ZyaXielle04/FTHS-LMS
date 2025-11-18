@@ -323,7 +323,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function postStudentGrades(studentId) {
-        // Verify teacherId is set
         if (!teacherId) {
             console.error('Current user ID not available');
             showToast('Cannot post grades - user not authenticated', 'error');
@@ -342,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const studentName = `${student.firstName} ${student.lastName}`;
-        
+
         const gradebookEntry = {
             studentId: studentId,
             studentName: studentName,
@@ -352,29 +351,39 @@ document.addEventListener('DOMContentLoaded', function() {
             className: `Grade ${classData.gradeLevel || ''} ${classData.strand || ''} - ${classData.sectionNumber || ''}`.trim()
         };
 
-        // Validate the gradebook entry
-        if (Object.values(gradebookEntry).some(val => val === undefined)) {
-            console.error('Invalid gradebook entry:', gradebookEntry);
-            loadingToast.remove();
-            showToast('Failed to post grades - invalid data', 'error');
-            return;
-        }
+        // Extract subjectId from classKey
+        const parts = classKey.split('_'); 
+        const subjectId = parts[1]; 
 
-        database.ref(`gradebook/${classKey}/${studentId}`).set(gradebookEntry)
-            .then(() => {
-                loadingToast.remove();
-                showToast('Grades posted successfully!', 'success');
-                
-                // Update the last posted time in the UI
-                document.querySelectorAll(`.student-card[data-student-id="${studentId}"] .last-updated`).forEach(el => {
-                    el.textContent = `Last posted: ${formatDate(Date.now())}`;
-                });
-            })
-            .catch(error => {
-                console.error('Error posting grades:', error);
-                loadingToast.remove();
-                showToast('Failed to post grades', 'error');
+        // Fetch subjectName
+        database.ref(`subjects/${subjectId}/subjectName`).once('value').then(subjectSnap => {
+            const subjectName = subjectSnap.exists() ? subjectSnap.val() : 'Unknown Subject';
+
+            // Push notification with subjectName
+            database.ref(`notifications/${studentId}`).push({
+                title: "Grades Released",
+                message: `Your updated grades for ${subjectName} have been posted.`,
+                classKey: classKey,
+                subjectName: subjectName,
+                timestamp: Date.now(),
+                seen: false
             });
+
+            // Update gradebook
+            return database.ref(`gradebook/${classKey}/${studentId}`).set(gradebookEntry);
+        }).then(() => {
+            loadingToast.remove();
+            showToast('Grades posted successfully!', 'success');
+
+            // Update last posted time in UI
+            document.querySelectorAll(`.student-card[data-student-id="${studentId}"] .last-updated`).forEach(el => {
+                el.textContent = `Last posted: ${formatDate(Date.now())}`;
+            });
+        }).catch(error => {
+            console.error('Error posting grades or fetching subject:', error);
+            loadingToast.remove();
+            showToast('Failed to post grades', 'error');
+        });
     }
     
     function calculateOverallGrade(studentId, attendanceData) {

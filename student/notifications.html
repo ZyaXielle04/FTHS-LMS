@@ -3,100 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FTHS LMS - My Classes</title>
+    <title>FTHS LMS - Notifications</title>
+
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Firebase SDK -->
+
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/classes.css">
-
+    <link rel="stylesheet" href="css/notifications.css">
 </head>
+
 <body>
+
     <div class="sidebar-overlay"></div>
     <button class="burger-menu">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
     </button>
+
     <div class="student-container">
-        <!-- Sidebar Navigation -->
+
+        <!-- SIDEBAR -->
         <aside class="student-sidebar">
             <div class="sidebar-header">
-                <img src="../images/FTHS-logo.jpg" alt="FTHS Logo" class="logo">
+                <img src="../images/FTHS-logo.jpg" class="logo">
                 <h2>FTHS LMS Student</h2>
             </div>
+
             <nav class="sidebar-nav">
                 <ul>
-                    <li>
-                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                    </li>
-                    <li class="active">
-                        <a href="classes.html"><i class="fas fa-chalkboard"></i> My Classes</a>
-                    </li>
-                    <li>
-                        <a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a>
-                    </li>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="classes.html"><i class="fas fa-chalkboard"></i> My Classes</a></li>
+                    <li class="active"><a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
                 </ul>
             </nav>
+
             <div class="sidebar-footer">
                 <button id="changePasswordBtn"><i class="fas fa-key"></i> Change Password</button>
                 <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </aside>
 
-        <!-- Main Content Area -->
+        <!-- MAIN -->
         <main class="student-main">
+
             <header class="student-header">
                 <div class="header-left">
-                    <h1>My Classes</h1>
-                    <p>View and manage your enrolled classes</p>
+                    <h1>Notifications</h1>
+                    <p>Stay updated with class announcements & system alerts</p>
                 </div>
                 <div class="header-right">
                     <div id="currentDateTime" class="datetime-display"></div>
                 </div>
             </header>
 
-            <!-- Classes Content -->
-            <div class="classes-container">
-                <div class="classes-header">
-                    <h2><i class="fas fa-book-open"></i> Enrolled Classes</h2>
-                </div>
-                
-                <div class="class-cards">
-                    <!-- Cards will be dynamically inserted here by classes.js -->
-                    <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading classes...</div>
-                </div>
-                
-                <div class="class-details-section">
-                    <div class="class-schedule">
-                        <h3><i class="fas fa-calendar-week"></i> Weekly Class Schedule</h3>
-                        <div class="schedule-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Monday</th>
-                                        <th>Tuesday</th>
-                                        <th>Wednesday</th>
-                                        <th>Thursday</th>
-                                        <th>Friday</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="schedule-body">
-                                    <!-- Will be populated dynamically -->
-                                </tbody>
-                            </table>
+            <!-- NOTIFICATIONS CONTENT -->
+            <div class="notifications-container">
+
+                <h2><i class="fas fa-bell"></i> Recent Notifications</h2>
+
+                <div id="notificationsList" class="notifications-list">
+
+                    <!-- Example (remove once Firebase loads actual data) -->
+                    <div class="notification-item unread">
+                        <div class="notif-icon"><i class="fas fa-info-circle"></i></div>
+                        <div class="notif-info">
+                            <h3>New Assignment Posted</h3>
+                            <p>Your teacher added a new activity for Mathematics.</p>
+                            <span class="notif-time">2 hours ago</span>
                         </div>
+                        <button class="mark-read-btn">Mark as Read</button>
                     </div>
+
                 </div>
+
             </div>
         </main>
     </div>
 
-    <!-- Change Password Modal -->
+    <!-- CHANGE PASSWORD MODAL -->
     <div id="changePasswordModal">
         <div class="modal-content">
             <button class="close-modal">&times;</button>
@@ -109,23 +97,24 @@
                     <i class="fas fa-lock input-icon"></i>
                     <input type="password" id="currentPassword" placeholder="Current Password" required>
                 </div>
-                
+
                 <div class="input-group">
                     <i class="fas fa-key input-icon"></i>
                     <input type="password" id="newPassword" placeholder="New Password" required>
                 </div>
+
                 <div class="password-strength">
                     <span>Strength:</span>
                     <div class="strength-meter">
                         <div class="strength-meter-fill"></div>
                     </div>
                 </div>
-                
+
                 <div class="input-group">
                     <i class="fas fa-check-circle input-icon"></i>
                     <input type="password" id="confirmPassword" placeholder="Confirm New Password" required>
                 </div>
-                
+
                 <button type="submit">
                     <i class="fas fa-sync-alt" style="margin-right: 8px;"></i>
                     Update Password
@@ -134,10 +123,10 @@
         </div>
     </div>
 
+    <!-- JS -->
     <script src="../firebase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/common.js"></script>
-    <script src="js/classes.js"></script>
-    <script src="../overdue-checker.js"></script>
+    <script src="js/notifications.js"></script>
 </body>
 </html>

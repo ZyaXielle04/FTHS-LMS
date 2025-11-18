@@ -766,6 +766,7 @@ async function handleAssignmentSubmit(e) {
             return;
         }
 
+        // Calculate points
         let points;
         if (type === 'homework') {
             points = parseInt(document.getElementById('assignmentPoints').value) || 0;
@@ -777,43 +778,67 @@ async function handleAssignmentSubmit(e) {
             }
         }
 
+        // Fetch subject name from classKey
+        const [sectionId, subjectId] = classKey.split('_');
+        let subjectName = 'Unknown Subject';
+        if (subjectId) {
+            const subjectSnapshot = await db.ref(`subjects/${subjectId}`).once('value');
+            subjectName = subjectSnapshot.val()?.subjectName || 'Unknown Subject';
+        }
+
+        // Prepare assignment data
         const assignmentData = {
             title,
             dueDate,
-            points: points,
+            points,
             description,
             type,
             teacher: currentTeacherId,
-            classId: classKey
+            classId: classKey,
+            subjectName // Include subject name
         };
 
         // Add linked resource if selected
         if (linkedResourceId) {
             assignmentData.linkedResourceId = linkedResourceId;
-            
-            // Get resource details for display
+
             const resource = await getResourceDetails(linkedResourceId);
             if (resource) {
                 assignmentData.linkedResource = {
                     id: linkedResourceId,
                     title: resource.title,
                     type: resource.type,
-                    downloadUrl: resource.downloadUrl || null, // Ensure this is never undefined
-                    filePath: resource.filePath || null // Ensure this is never undefined
+                    downloadUrl: resource.downloadUrl || null,
+                    filePath: resource.filePath || null
                 };
             }
         } else {
-            // If no resource is selected, ensure we remove any existing linked resource
             assignmentData.linkedResourceId = null;
             assignmentData.linkedResource = null;
         }
 
+        // Add questions if quiz or exam
         if (type === 'quiz' || type === 'exam') {
             assignmentData.questions = quizItems;
             assignmentData.totalQuestions = quizItems.length;
         }
 
-        await saveAssignmentData(assignmentData);
+        // ✅ Save assignment and get the new assignment key
+        const newAssignmentRef = db.ref(`classes/${classKey}/assignments`).push();
+        await newAssignmentRef.set(assignmentData);
+        const assignmentId = newAssignmentRef.key;
+
+        // Send notifications to students
+        await sendAssignmentNotification(assignmentData, assignmentId, subjectName);
+
+        Swal.fire('Success', 'Assignment saved and notifications sent!', 'success');
+
+        // Reset form
+        assignmentForm.reset();
+        quizItems = [];
+        quizItemsList.innerHTML = '';
+        updateTotalPoints();
+        closeAllModals();
 
     } catch (error) {
         console.error('Error submitting assignment:', error);
@@ -1583,5 +1608,33 @@ async function getResourceDetails(resourceId) {
     } catch (error) {
         console.error('Error getting resource details:', error);
         return null;
+    }
+}
+
+// Function to send notifications to students in the class
+async function sendAssignmentNotification(assignmentData, assignmentId, subjectName) {
+    try {
+        const studentsRef = db.ref(`classes/${classKey}/students`);
+        const snapshot = await studentsRef.once('value');
+        const students = snapshot.val();
+
+        if (!students) return;
+
+        const notificationPromises = Object.keys(students).map(studentId => {
+            const notificationRef = db.ref(`notifications/${studentId}`).push();
+            return notificationRef.set({
+                title: `${assignmentData.type.charAt(0).toUpperCase() + assignmentData.type.slice(1)} Assigned`,
+                message: `A new ${assignmentData.type} for <strong>${subjectName}</strong> titled "${assignmentData.title}" has been assigned. <br>Due: ${new Date(assignmentData.dueDate).toLocaleString()}`,
+                type: assignmentData.type,
+                link: `/student/assignment.html?class=${classKey}&assignment=${assignmentId}`,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                read: false
+            });
+        });
+
+        await Promise.all(notificationPromises);
+
+    } catch (error) {
+        console.error('Error sending notifications:', error);
     }
 }

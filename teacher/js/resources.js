@@ -469,6 +469,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         newResourceRef.set(resourceData)
             .then(() => {
+                // 1. Send notification to students
+                sendNewModuleNotificationToStudents(resourceData);
+
                 Swal.fire('Success', 'Resource added successfully!', 'success');
                 closeUploadModal();
                 uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Resource';
@@ -478,6 +481,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire('Error', `Failed to save resource: ${error.message}`, 'error');
                 uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Resource';
                 uploadBtn.disabled = false;
+            });
+    }
+
+    function sendNewModuleNotificationToStudents(resourceData) {
+        // Get all students in this class
+        db.ref(`classes/${classKey}/students`).once('value')
+            .then(snapshot => {
+                const students = snapshot.val();
+                if (!students) return;
+
+                const timestamp = Date.now();
+
+                Object.keys(students).forEach(studentId => {
+                    const notifRef = db.ref(`notifications/${studentId}`).push();
+                    notifRef.set({
+                        title: 'New Module Posted',
+                        message: `A new module "${resourceData.title}" has been posted in your class.`,
+                        timestamp: timestamp,
+                        seen: false
+                    });
+                });
             });
     }
 
