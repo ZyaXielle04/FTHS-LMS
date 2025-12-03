@@ -310,7 +310,7 @@ function loadTodaysSchedule(studentId) {
                         <p>${classItem.teacher} | ${classItem.room}</p>
                     </div>
                     <button class="join-class-btn" data-class-id="${classItem.classId}">
-                        ${classItem.startTime > currentTime ? 'Join Class' : 'In Progress'}
+                        ${classItem.startTime > currentTime ? 'View Class' : 'In Progress'}
                     </button>
                 `;
                 
