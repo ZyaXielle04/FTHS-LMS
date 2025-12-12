@@ -40,6 +40,9 @@
                     <li>
                         <a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a>
                     </li>
+                    <li>
+                        <a id="profileBtn"><i class="fas fa-user"></i> Profile</a>
+                    </li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
@@ -129,6 +132,49 @@
                 <button type="submit">
                     <i class="fas fa-sync-alt" style="margin-right: 8px;"></i>
                     Update Password
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal">
+        <div class="modal-content">
+            <button class="close-profile-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Profile</h2>
+                <p>Your account information</p>
+            </div>
+            <form id="profileForm">
+                <div class="input-group">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" id="profileFullName" placeholder="Full Name" readonly>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="profileEmail" placeholder="Email" readonly>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-id-badge input-icon"></i>
+                    <input type="text" id="profileRole" placeholder="Role" readonly>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-user-friends input-icon"></i>
+                    <input type="text" id="profileGuardian" placeholder="Guardian's Name">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-phone input-icon"></i>
+                    <input type="text" id="profileContact" placeholder="Contact Number">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-map-marker-alt input-icon"></i>
+                    <input type="text" id="profileAddress" placeholder="Address">
+                </div>
+
+                <!-- Save Button -->
+                <button type="button" id="saveProfileBtn">
+                    <i class="fas fa-save" style="margin-right: 8px;"></i>
+                    Save Changes
                 </button>
             </form>
         </div>

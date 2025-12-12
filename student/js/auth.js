@@ -199,6 +199,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Auto logout after 15 minutes of inactivity
+    let inactivityTimer;
+    const inactivityLimit = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Logged Out Due to Inactivity',
+                text: 'You have been inactive for 15 minutes. You will be logged out now.',
+                confirmButtonColor: '#3085d6',
+            }).then(() => {
+                localStorage.removeItem('authUser');
+                sessionStorage.removeItem('authUser');
+                window.location.href = '../../index.html';
+            });
+        }, inactivityLimit);
+    }
+
+    // Reset timer on user activity
+    ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+        document.addEventListener(event, resetInactivityTimer, true);
+    });
+
+    // Start the timer on page load
+    resetInactivityTimer();
+
     // Periodically check auth status (every 5 minutes)
     setInterval(checkAuth, 300000);
 });
