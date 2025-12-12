@@ -1,4 +1,4 @@
-// assignments.js - Complete implementation for assignment management
+// assignments.js - Complete implementation for assignment management with Identification support
 let assignmentsCleanup = null;
 let currentModal = null;
 
@@ -285,6 +285,7 @@ function renderQuestion(question, index) {
             break;
             
         case 'enumeration':
+        case 'identification':
             questionHtml += `
                 <div class="answer">
                     <textarea name="q${index}" placeholder="Your answer..." ${question.required ? 'required' : ''}></textarea>
@@ -316,6 +317,7 @@ function collectQuizAnswers(questions) {
                 break;
                 
             case 'enumeration':
+            case 'identification':
                 const textarea = document.querySelector(`[name="${questionKey}"]`);
                 answers[index] = textarea ? textarea.value.trim() : '';
                 break;
@@ -356,11 +358,11 @@ async function submitQuizAnswers(classId, assignmentId, studentId, answers, ques
             answer: studentAnswer,
             points: 0,
             correct: false,
-            needsTeacherGrading: question.type === 'enumeration'
+            needsTeacherGrading: question.type === 'enumeration' || question.type === 'identification'
         };
         
-        // Only auto-grade non-enumeration questions
-        if (question.type !== 'enumeration') {
+        // Only auto-grade non-manual questions
+        if (!gradedAnswers[index].needsTeacherGrading) {
             if (question.type === 'mcq_single' || question.type === 'true_false') {
                 if (studentAnswer != null && studentAnswer.toString() === question.correctAnswer.toString()) {
                     gradedAnswers[index].points = question.points;
@@ -383,8 +385,7 @@ async function submitQuizAnswers(classId, assignmentId, studentId, answers, ques
         }
     });
     
-    // Determine if any questions need teacher grading
-    const needsTeacherGrading = questions.some(q => q.type === 'enumeration');
+    const needsTeacherGrading = questions.some(q => q.type === 'enumeration' || q.type === 'identification');
     
     const updates = {
         [`classes/${classId}/assignments/${assignmentId}/studentAnswers/${studentId}/answers`]: gradedAnswers,

@@ -1023,6 +1023,8 @@ function generateQuestionHTML(question, number) {
         questionHTML += `<p>Correct answer: <strong>${question.correctAnswer ? 'True' : 'False'}</strong></p>`;
     } else if (question.type === 'enumeration') {
         questionHTML += `<p>Expected answer: <strong>${question.correctAnswer}</strong></p>`;
+    } else if (question.type === 'identification') {
+        questionHTML += `<p>Correct answer (for reference): <strong>${question.correctAnswer}</strong></p>`;
     }
 
     questionHTML += `</div>`;
@@ -1034,7 +1036,8 @@ function formatQuestionType(type) {
         'mcq_single': 'Multiple Choice (Single Answer)',
         'mcq_multiple': 'Multiple Choice (Multiple Answers)',
         'true_false': 'True or False',
-        'enumeration': 'Enumeration'
+        'enumeration': 'Enumeration',
+        'identification': 'Identification'
     };
     return types[type] || type;
 }
@@ -1254,6 +1257,11 @@ function handleQuizItemSubmit(e) {
 
             case 'enumeration':
                 break;
+
+            case 'identification':
+                const referenceAnswer = document.getElementById('identificationAnswer').value.trim();
+                quizItem.correctAnswer = referenceAnswer || null; // optional reference for manual grading
+                break;
         }
 
         // Update or add the item
@@ -1417,7 +1425,22 @@ function editQuizItem(index) {
         const correctValue = item.correctAnswer ? 'true' : 'false';
         const correctInput = document.querySelector(`input[name="trueFalseAnswer"][value="${correctValue}"]`);
         if (correctInput) correctInput.checked = true;
+    } else if (item.type === 'identification') {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'quiz-item';
+        itemElement.dataset.index = index;
+
+        itemElement.innerHTML = `
+            <div class="quiz-item-header">
+                <div class="quiz-item-type">Identification</div>
+                <div class="quiz-item-points">${item.points} pts</div>
+            </div>
+            <div class="quiz-item-question">${item.question}</div>
+            <div class="quiz-item-reference">Reference Answer: ${item.correctAnswer || 'N/A'}</div>
+        `;
+        quizItemsList.appendChild(itemElement);
     }
+
 
     // Show modal
     quizItemModal.style.display = 'block';
@@ -1450,13 +1473,13 @@ function removeQuizItem(index) {
 
 function handleItemTypeChange(e) {
     const type = e?.target?.value || document.getElementById('itemType').value;
-    
-    // Hide all containers first
+
+    // Hide all type-specific containers
     mcqOptionsContainer.style.display = 'none';
     trueFalseContainer.style.display = 'none';
     document.getElementById('correctAnswerContainer').style.display = 'none';
-    
-    // Show the appropriate container
+    document.getElementById('identificationContainer').style.display = 'none';
+
     if (type === 'mcq_single' || type === 'mcq_multiple') {
         mcqOptionsContainer.style.display = 'block';
         document.getElementById('correctAnswerContainer').style.display = 'block';
@@ -1464,6 +1487,8 @@ function handleItemTypeChange(e) {
     } else if (type === 'true_false') {
         trueFalseContainer.style.display = 'block';
         document.getElementById('correctAnswerContainer').style.display = 'block';
+    } else if (type === 'identification') {
+        document.getElementById('identificationContainer').style.display = 'block';
     }
 }
 

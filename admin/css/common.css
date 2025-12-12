@@ -1,12 +1,12 @@
 /* Base Styles */
 :root {
-    --primary-color: #3498db;
-    --secondary-color: #2980b9;
-    --accent-color: #e74c3c;
-    --light-color: #ecf0f1;
-    --dark-color: #2c3e50;
-    --success-color: #2ecc71;
-    --warning-color: #f39c12;
+    --primary-color: #FF0000; /* Red */
+    --secondary-color: #FFD700; /* Gold */
+    --accent-color: #FF4500; /* Orange-Red */
+    --light-color: #fff8e1; /* Light gold background */
+    --dark-color: #8B0000; /* Dark red for sidebar */
+    --success-color: #32CD32; /* Keep green for success messages */
+    --warning-color: #FFA500; /* Orange for warnings */
     --sidebar-width: 250px;
 }
 
@@ -31,7 +31,7 @@ body {
 /* Sidebar Styles */
 .admin-sidebar {
     width: var(--sidebar-width);
-    background-color: var(--dark-color);
+    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
     color: white;
     position: fixed;
     height: 100vh;
@@ -75,8 +75,8 @@ body {
 
 .sidebar-nav a:hover,
 .sidebar-nav li.active a {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-left: 4px solid var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.2);
+    border-left: 4px solid var(--secondary-color);
 }
 
 .sidebar-nav i {
@@ -90,6 +90,9 @@ body {
     position: absolute;
     bottom: 0;
     width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, var(--dark-color), var(--primary-color));
+    color: white;
 }
 
 /* Main Content Area */
@@ -98,14 +101,17 @@ body {
     margin-left: var(--sidebar-width);
     padding: 20px;
     min-height: 100vh;
+    color: #333;
 }
 
+/* Admin Header */
 .admin-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background-color: white;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    color: white;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
@@ -134,12 +140,12 @@ body {
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: var(--secondary-color);
+    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
 }
 
 .btn-secondary {
@@ -152,12 +158,12 @@ body {
 }
 
 .btn-danger {
-    background-color: var(--accent-color);
+    background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
     color: white;
 }
 
 .btn-danger:hover {
-    background-color: #c0392b;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
 }
 
 /* Form Elements */
@@ -179,6 +185,8 @@ body {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
+    background-color: #fff8e1;
+    color: #333;
 }
 
 .form-group textarea {
@@ -200,13 +208,14 @@ body {
 }
 
 .modal-content {
-    background-color: white;
+    background: linear-gradient(135deg, #fff8e1, #FFD700);
     padding: 20px;
     border-radius: 5px;
     width: 90%;
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
+    color: #333;
 }
 
 .close-modal {
@@ -230,7 +239,8 @@ body {
 }
 
 .data-table th {
-    background-color: #f5f5f5;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    color: white;
     font-weight: 600;
 }
 
@@ -290,7 +300,7 @@ body {
     gap: 8px;
     width: 100%;
     padding: 10px 15px;
-    background-color: #e74c3c;
+    background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
     color: white;
     border: none;
     border-radius: 6px;
@@ -302,7 +312,7 @@ body {
 }
 
 #logoutBtn:hover {
-    background-color: #c0392b;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
 }
@@ -321,29 +331,9 @@ body {
     transform: translateX(-3px);
 }
 
-/* Sidebar Footer Adjustments */
-.sidebar-footer {
-    padding: 20px;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.datetime-display {
-    font-size: 16px;
-    font-weight: 500;
-    color: #333;
-    text-align: right;
-    padding: 8px 12px;
-    border-radius: 8px;
-    background-color: #f5f5f5;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
-
-/* ===== PROFILE MODAL (RESTYLED) ===== */
+/* Profile Modal */
 #profileModal {
-    display: none;
+    display: none !important;
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -363,7 +353,7 @@ body {
 }
 
 #profileModal .profile-modal-content {
-    background: #fff !important;
+    background: linear-gradient(135deg, #fff8e1, #FFD700) !important;
     width: 450px !important;
     max-width: 95vw !important;
     padding: 30px 25px !important;
@@ -372,6 +362,7 @@ body {
     position: relative;
     animation: slideDown 0.3s ease;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
 }
 
 @keyframes slideDown {
@@ -433,7 +424,7 @@ body {
 
 .profile-field input:focus {
     border-color: var(--primary-color) !important;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2) !important;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.2) !important;
     outline: none !important;
 }
 
@@ -443,7 +434,7 @@ body {
     margin-top: 20px !important;
     border: none !important;
     border-radius: 8px !important;
-    background: var(--primary-color) !important;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)) !important;
     color: white !important;
     font-weight: 600 !important;
     cursor: pointer !important;
@@ -452,7 +443,7 @@ body {
 }
 
 #resetPasswordBtn:hover, #updatePasswordBtn:hover {
-    background: var(--secondary-color) !important;
+    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color)) !important;
     transform: translateY(-1px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }

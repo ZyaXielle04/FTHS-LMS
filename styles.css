@@ -1,8 +1,8 @@
 :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #1a252f;
-    --accent-color: #3498db;
-    --light-color: #ecf0f1;
+    --primary-color: #8b0000;     /* Deep Red */
+    --secondary-color: #650000;   /* Darker Red */
+    --accent-color: #d4af37;      /* Gold */
+    --light-color: #fff8e1;       /* Light warm gold */
     --error-color: #e74c3c;
 }
 
@@ -19,17 +19,19 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    /* KEEPING your gradient here UNCHANGED */
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     padding: 1rem;
 }
 
 .login-container {
-    background-color: white;
+    background: linear-gradient(135deg, #ffffff, #fff8e5);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
     padding: 2rem;
+    border: 2px solid var(--accent-color);
 }
 
 .login-header {
@@ -44,13 +46,15 @@ body {
 }
 
 .login-header h1 {
-    color: var(--primary-color);
+    background: linear-gradient(135deg, #8b0000, #d4af37);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
 }
 
 .login-header h2 {
-    color: #7f8c8d;
+    color: #b8860b; /* Soft gold */
     font-size: 0.9rem;
     font-weight: normal;
 }
@@ -63,7 +67,7 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     color: var(--primary-color);
-    font-weight: 500;
+    font-weight: 600;
     font-size: 0.9rem;
 }
 
@@ -71,16 +75,18 @@ input[type="text"],
 input[type="password"] {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #ddd;
+    border: 1px solid #d4af37;
     border-radius: 4px;
     font-size: 1rem;
     transition: border-color 0.3s;
+    background-color: #fffdf5;
 }
 
 input[type="text"]:focus,
 input[type="password"]:focus {
-    border-color: var(--accent-color);
+    border-color: #b8860b;
     outline: none;
+    box-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
 }
 
 .form-options {
@@ -105,6 +111,7 @@ input[type="password"]:focus {
 
 .forgot-password {
     color: var(--accent-color);
+    font-weight: 600;
     text-decoration: none;
 }
 
@@ -115,18 +122,18 @@ input[type="password"]:focus {
 .login-btn {
     width: 100%;
     padding: 0.75rem;
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, #8b0000, #d4af37);
     color: white;
     border: none;
     border-radius: 4px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: 0.3s;
 }
 
 .login-btn:hover {
-    background-color: var(--secondary-color);
+    background: linear-gradient(135deg, #650000, #c9a437);
 }
 
 .login-footer {
@@ -138,6 +145,7 @@ input[type="password"]:focus {
 
 .login-footer a {
     color: var(--accent-color);
+    font-weight: 600;
     text-decoration: none;
 }
 
@@ -146,152 +154,19 @@ input[type="password"]:focus {
 }
 
 .error-message {
-    color: var(--error-color);
-    font-size: 0.9rem;
+    color: #ff4444;
+    font-size: 0.85rem;
     margin-top: 0.5rem;
     display: none;
 }
 
-/* Media Queries for Responsiveness */
-@media (max-width: 480px) {
-    .login-container {
-        padding: 1.5rem;
-    }
-    
-    .login-header .logo {
-        width: 70px;
-        height: 70px;
-    }
-    
-    .login-header h1 {
-        font-size: 1.3rem;
-    }
-    
-    .login-header h2 {
-        font-size: 0.8rem;
-    }
-    
-    .form-options {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .forgot-password {
-        margin-top: 0.5rem;
-    }
-}
-
-@media (max-width: 360px) {
-    .login-container {
-        padding: 1.25rem;
-    }
-    
-    .login-header .logo {
-        width: 60px;
-        height: 60px;
-    }
-    
-    input[type="text"],
-    input[type="password"] {
-        padding: 0.6rem;
-    }
-    
-    .login-btn {
-        padding: 0.6rem;
-    }
-}
-
-/* For very small heights (mobile landscape) */
-@media (max-height: 500px) {
-    body {
-        align-items: flex-start;
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
-    
-    .login-container {
-        padding: 1rem;
-    }
-    
-    .login-header {
-        margin-bottom: 1rem;
-    }
-    
-    .login-header .logo {
-        width: 50px;
-        height: 50px;
-        margin-bottom: 0.5rem;
-    }
-    
-    .input-group {
-        margin-bottom: 0.75rem;
-    }
-}
-
-/* For tablet and larger screens */
-@media (min-width: 768px) and (min-height: 1024px) {
-    .login-container {
-        padding: 3rem;
-    }
-    
-    .login-header .logo {
-        width: 150px;
-        height: 150px;
-    }
-    
-    .login-header h1 {
-        font-size: 2rem;
-    }
-    
-    .login-header h2 {
-        font-size: 1.1rem;
-    }
-    
-    label {
-        font-size: 1rem;
-    }
-    
-    input[type="text"],
-    input[type="password"] {
-        padding: 1rem;
-        font-size: 1.1rem;
-    }
-    
-    .login-btn {
-        padding: 1rem;
-        font-size: 1.1rem;
-    }
-    
-    .login-footer {
-        font-size: 0.9rem;
-    }
-}
-
-/* For very large screens */
-@media (min-width: 1200px) {
-    .login-container {
-        max-width: 450px;
-    }
-}
-
-/* Add to your existing styles */
+/* Disabled button */
 .login-btn:disabled {
-    background-color: #95a5a6;
+    background-color: #b9b9b9;
     cursor: not-allowed;
 }
 
-.login-btn:disabled:hover {
-    background-color: #95a5a6;
-}
-
-.error-message {
-    color: var(--error-color);
-    font-size: 0.85rem;
-    margin-top: 0.25rem;
-    display: none;
-}
-
-/* Loading spinner for button */
+/* Loading Spinner */
 .login-btn.loading {
     position: relative;
     color: transparent;
@@ -314,22 +189,46 @@ input[type="password"]:focus {
 }
 
 @keyframes button-loading-spinner {
-    from {
-        transform: rotate(0turn);
-    }
-    to {
-        transform: rotate(1turn);
-    }
+    from { transform: rotate(0turn); }
+    to { transform: rotate(1turn); }
 }
 
-.error-message {
-    color: #ff4444;
-    font-size: 0.8rem;
-    margin-top: 5px;
-    height: 16px;
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+    .login-container { padding: 1.5rem; }
+    .login-header .logo { width: 70px; height: 70px; }
+    .login-header h1 { font-size: 1.3rem; }
+    .login-header h2 { font-size: 0.8rem; }
+    .form-options { flex-direction: column; align-items: flex-start; }
+    .forgot-password { margin-top: 0.5rem; }
 }
 
-.login-btn:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+@media (max-width: 360px) {
+    .login-container { padding: 1.25rem; }
+    .login-header .logo { width: 60px; height: 60px; }
+    input[type="text"], input[type="password"] { padding: 0.6rem; }
+    .login-btn { padding: 0.6rem; }
+}
+
+@media (max-height: 500px) {
+    body { align-items: flex-start; padding-top: 1rem; padding-bottom: 1rem; }
+    .login-container { padding: 1rem; }
+    .login-header { margin-bottom: 1rem; }
+    .login-header .logo { width: 50px; height: 50px; margin-bottom: 0.5rem; }
+    .input-group { margin-bottom: 0.75rem; }
+}
+
+@media (min-width: 768px) and (min-height: 1024px) {
+    .login-container { padding: 3rem; }
+    .login-header .logo { width: 150px; height: 150px; }
+    .login-header h1 { font-size: 2rem; }
+    .login-header h2 { font-size: 1.1rem; }
+    label { font-size: 1rem; }
+    input[type="text"], input[type="password"] { padding: 1rem; font-size: 1.1rem; }
+    .login-btn { padding: 1rem; font-size: 1.1rem; }
+    .login-footer { font-size: 0.9rem; }
+}
+
+@media (min-width: 1200px) {
+    .login-container { max-width: 450px; }
 }
