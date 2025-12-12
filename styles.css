@@ -46,9 +46,13 @@ body {
 }
 
 .login-header h1 {
-    background: linear-gradient(135deg, #8b0000, #d4af37);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    background: linear-gradient(135deg, #8b0000, #d4af37); /* Red to gold gradient */
+    
+    /* Gradient on text */
+    -webkit-background-clip: text; /* Chrome, Safari, Edge */
+    -webkit-text-fill-color: transparent; /* Chrome, Safari, Edge */
+    background-clip: text; /* Standard property for supporting browsers */
+    
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
 }
