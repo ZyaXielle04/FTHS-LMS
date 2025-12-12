@@ -35,14 +35,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Load teachers from Firebase
-    function loadTeachers() {
-        teachersRef.on('value', (snapshot) => {
+    async function loadTeachers() {
+        teachersRef.on('value', async (snapshot) => {
             allTeachers = [];
+
+            // Use Promise.all to fetch all /users data for locked status
+            const teacherPromises = [];
+
             snapshot.forEach((childSnapshot) => {
                 const teacher = childSnapshot.val();
                 teacher.id = childSnapshot.key;
-                allTeachers.push(teacher);
+
+                // Push a promise that fetches /users/{uid}/locked
+                teacherPromises.push(
+                    usersRef.child(teacher.id).child('locked').once('value').then(userSnap => {
+                        teacher.locked = userSnap.val() === true;
+                        return teacher;
+                    })
+                );
             });
+
+            allTeachers = await Promise.all(teacherPromises);
             filteredTeachers = [...allTeachers];
             renderTable();
         });
@@ -76,6 +89,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button class="action-btn delete" data-id="${teacher.id}" title="Delete">
                         <i class="fas fa-trash-alt"></i>
                     </button>
+                    ${teacher.locked ? `
+                    <button class="action-btn unlock" data-id="${teacher.id}" title="Unlock Teacher">
+                        <i class="fas fa-unlock"></i>
+                    </button>` : ''}
                 </td>
             `;
             
@@ -193,8 +210,67 @@ document.addEventListener('DOMContentLoaded', function() {
                 showResetPasswordConfirmation(teacherId);
             } else if (action === 'delete') {
                 showDeleteConfirmation(teacherId);
+            } else if (action === 'unlock') {
+                showUnlockConfirmation(teacherId);
             }
         });
+    }
+
+    // Show unlock confirmation
+    function showUnlockConfirmation(teacherId) {
+        const teacher = allTeachers.find(t => t.id === teacherId);
+        
+        Swal.fire({
+            title: 'Unlock Teacher',
+            html: `Are you sure you want to unlock <strong>${teacher.name}</strong> (ID: ${teacherId})?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, unlock!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                unlockTeacher(teacherId);
+            }
+        });
+    }
+
+    // Unlock teacher
+    async function unlockTeacher(teacherId) {
+        Swal.fire({
+            title: 'Unlocking...',
+            html: 'Please wait while we unlock the teacher',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+            backdrop: true
+        });
+
+        try {
+            await usersRef.child(teacherId).child('locked').remove();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Unlocked!',
+                text: 'Teacher account has been unlocked',
+                confirmButtonColor: '#3085d6',
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            // Update local copy and re-render
+            const teacher = allTeachers.find(t => t.id === teacherId);
+            if (teacher) teacher.locked = false;
+            renderTable();
+        } catch (error) {
+            console.error('Error unlocking teacher:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to unlock teacher: ' + error.message,
+                confirmButtonColor: '#3085d6',
+            });
+        }
     }
 
     // Edit teacher

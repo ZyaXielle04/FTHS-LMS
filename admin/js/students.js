@@ -59,8 +59,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 section.id = childSnapshot.key;
                 allSections.push(section);
             });
-            
-            // Update section dropdown if modal is open
+
+            // Re-render table in case section names change
+            renderTable();
+
             if (studentModal.style.display === 'flex') {
                 populateSectionDropdown();
             }
@@ -84,21 +86,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load students from Firebase with error handling
     function loadStudents() {
         showLoadingIndicator('Loading students...');
-        
-        studentsRef.on('value', (snapshot) => {
-            allStudents = [];
-            snapshot.forEach((childSnapshot) => {
-                const student = childSnapshot.val();
-                student.id = childSnapshot.key;
-                allStudents.push(student);
-            });
-            
-            filteredStudents = [...allStudents];
-            renderTable();
-            Swal.close();
+
+        // Listen for changes in students
+        studentsRef.on('value', async (studentsSnapshot) => {
+            try {
+                const usersSnapshot = await usersRef.once('value'); // still one-time, but merged on every change
+
+                allStudents = [];
+                studentsSnapshot.forEach((childSnapshot) => {
+                    const student = childSnapshot.val();
+                    student.id = childSnapshot.key;
+
+                    // Merge locked status from users
+                    const userData = usersSnapshot.child(student.id).val();
+                    student.locked = userData ? userData.locked : false;
+
+                    allStudents.push(student);
+                });
+
+                filteredStudents = [...allStudents];
+                renderTable();
+                Swal.close();
+            } catch (error) {
+                console.error('Error loading students:', error);
+                showError('Failed to load students. Please try again.');
+            }
         }, (error) => {
-            console.error('Error loading students:', error);
-            showError('Failed to load students. Please try again.');
+            console.error('Error listening to students:', error);
+            showError('Failed to listen for student updates.');
         });
     }
 
@@ -122,6 +137,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const student = filteredStudents[i];
             const row = document.createElement('tr');
             const isSelected = selectedStudents.has(student.id);
+            console.log('Student:', student.id, 'Locked:', student.locked);
+
             
             // Get section name
             let sectionName = 'N/A';
@@ -135,8 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
             row.innerHTML = `
                 <td class="checkbox-cell">
                     <input type="checkbox" class="student-checkbox" 
-                           data-id="${student.id}" 
-                           ${isSelected ? 'checked' : ''}>
+                        data-id="${student.id}" 
+                        ${isSelected ? 'checked' : ''}>
                 </td>
                 <td>${student.id || 'N/A'}</td>
                 <td>${formatName(student.lastName, student.firstName)}</td>
@@ -155,6 +172,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button class="btn-action btn-delete" data-id="${student.id}" title="Delete">
                         <i class="fas fa-trash-alt"></i>
                     </button>
+                    ${student.locked ? `
+                    <button class="btn-action btn-unlock" data-id="${student.id}" title="Unlock Account">
+                        <i class="fas fa-unlock"></i>
+                    </button>` : ''}
                 </td>
             `;
             
@@ -432,6 +453,34 @@ document.addEventListener('DOMContentLoaded', function() {
             showResetPasswordConfirmation(student);
         } else if (btn.classList.contains('btn-delete')) {
             showDeleteConfirmation(student);
+        } else if (btn.classList.contains('btn-unlock')) {
+            confirmUnlockStudent(student);
+        }
+    }
+
+    async function confirmUnlockStudent(student) {
+        const { isConfirmed } = await Swal.fire({
+            title: 'Unlock Student Account',
+            html: `Are you sure you want to unlock <strong>${student.firstName} ${student.lastName}</strong> (ID: ${student.id})?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, unlock it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (!isConfirmed) return;
+
+        try {
+            await usersRef.child(student.id).update({ locked: null }); // remove locked flag
+            await studentsRef.child(student.id).update({ locked: null }); // keep students collection in sync
+
+            showSuccess(`Account for ${student.firstName} ${student.lastName} has been unlocked.`);
+            renderTable(); // re-render table to remove unlock icon
+        } catch (error) {
+            console.error('Error unlocking student:', error);
+            showError('Failed to unlock student account. Please try again.');
         }
     }
 
